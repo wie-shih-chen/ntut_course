@@ -65,7 +65,7 @@
               <td>{{ item.username }}</td>
               <td>{{ item.ip }}</td>
               <td class="ip-location" data-ip="{{ item.ip }}"></td>
-              <td>{{ item.time }}</td>
+              <td>{{ item.time | to_taipei_time }}</td>
             </tr>
             {% else %}
             <tr><td colspan="4" class="text-center">尚無登入紀錄</td></tr>
@@ -111,7 +111,7 @@
               <td>{{ item.username }}</td>
               <td>{{ item.action }}</td>
               <td>{{ item.target }}</td>
-              <td>{{ item.time }}</td>
+              <td>{{ item.time | to_taipei_time }}</td>
             </tr>
             {% else %}
             <tr><td colspan="4" class="text-center">尚無操作紀錄</td></tr>
@@ -302,14 +302,31 @@ function fetchLogAjax(type) {
 function updateLoginLogTable(logs) {
   const tbody = document.getElementById('loginLogTbody');
   tbody.innerHTML = logs.length ? logs.map(item =>
-    `<tr><td>${item.username}</td><td data-ip="${item.ip}">${item.ip}</td><td class="ip-location" data-ip="${item.ip}"></td><td>${item.time}</td></tr>`
+    `<tr><td>${item.username}</td><td data-ip="${item.ip}">${item.ip}</td><td class="ip-location" data-ip="${item.ip}"></td><td>${toTaipeiTime(item.time)}</td></tr>`
   ).join('') : '<tr><td colspan="4" class="text-center">尚無登入紀錄</td></tr>';
 }
 function updateOpLogTable(logs) {
   const tbody = document.getElementById('opLogTbody');
   tbody.innerHTML = logs.length ? logs.map(item =>
-    `<tr><td>${item.username}</td><td>${item.action}</td><td>${item.target}</td><td>${item.time}</td></tr>`
+    `<tr><td>${item.username}</td><td>${item.action}</td><td>${item.target}</td><td>${toTaipeiTime(item.time)}</td></tr>`
   ).join('') : '<tr><td colspan="4" class="text-center">尚無操作紀錄</td></tr>';
+}
+function toTaipeiTime(utc_str) {
+    if (!utc_str) return "";
+    try {
+        const utc_dt = new Date(utc_str.replace(' ', 'T') + 'Z');
+        // 手動補上8小時的時差
+        const taipei_dt = new Date(utc_dt.getTime() + (8 * 60 * 60 * 1000));
+        const year = taipei_dt.getUTCFullYear();
+        const month = (taipei_dt.getUTCMonth() + 1).toString().padStart(2, '0');
+        const day = taipei_dt.getUTCDate().toString().padStart(2, '0');
+        const hours = taipei_dt.getUTCHours().toString().padStart(2, '0');
+        const minutes = taipei_dt.getUTCMinutes().toString().padStart(2, '0');
+        const seconds = taipei_dt.getUTCSeconds().toString().padStart(2, '0');
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    } catch (e) {
+        return utc_str;
+    }
 }
 </script>
 {% endblock %} 

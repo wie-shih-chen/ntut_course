@@ -1,7 +1,7 @@
 import json
 import os
 import re
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import bcrypt
 from functools import wraps
 from flask import Flask, render_template, request, redirect, url_for, session, flash, Response, jsonify
@@ -11,6 +11,24 @@ import csv
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # 請改成安全的 key
+
+# --- 時區設定 ---
+TAIPEI_TZ = timezone(timedelta(hours=8))
+
+@app.template_filter('to_taipei_time')
+def to_taipei_time(utc_str):
+    if not utc_str:
+        return ""
+    try:
+        # 解析 UTC 時間字串
+        utc_dt = datetime.strptime(utc_str, '%Y-%m-%d %H:%M:%S')
+        # 標記為 UTC 時區
+        utc_dt = utc_dt.replace(tzinfo=timezone.utc)
+        # 轉換為台北時區
+        taipei_dt = utc_dt.astimezone(TAIPEI_TZ)
+        return taipei_dt.strftime('%Y-%m-%d %H:%M:%S')
+    except (ValueError, TypeError):
+        return utc_str # 如果格式錯誤，返回原字串
 
 # 科系代碼對應表
 DEPT_CODE_MAP = {
