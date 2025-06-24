@@ -735,7 +735,7 @@ def admin_enroll_period():
             current_periods.append(p)
         elif end_num < today_num:
             past_periods.append(p)
-    return render_template('enroll_period.html', user=user, years=years, sems=sems, current_periods=current_periods, past_periods=past_periods, msg=msg)
+    return render_template('enroll_period.html', user=user, years=years, sems=sems, periods=periods, msg=msg)
 
 ENROLL_RECORD_FILE = os.path.join(os.path.dirname(__file__), 'data', 'enroll_record.json')
 def load_enroll_record():

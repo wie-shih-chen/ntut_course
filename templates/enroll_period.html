@@ -48,82 +48,39 @@
     </div>
   </div>
   <h4 class="mb-3">現有設定</h4>
-  <ul class="nav nav-tabs mb-3" id="periodTab" role="tablist">
-    <li class="nav-item" role="presentation">
-      <button class="nav-link active" id="current-tab" data-bs-toggle="tab" data-bs-target="#current" type="button" role="tab" aria-controls="current" aria-selected="true">進行中時段</button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="past-tab" data-bs-toggle="tab" data-bs-target="#past" type="button" role="tab" aria-controls="past" aria-selected="false">歷史時段</button>
-    </li>
-  </ul>
-  <div class="tab-content" id="periodTabContent">
-    <div class="tab-pane fade show active" id="current" role="tabpanel" aria-labelledby="current-tab">
-      <div class="table-responsive">
-        <table class="table table-bordered table-hover align-middle text-center">
-          <thead class="table-light">
-            <tr>
-              <th><input type="checkbox" id="select-all-current"></th>
-              <th>學年-學期</th><th>時段名稱</th><th>開始</th><th>結束</th><th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for p in current_periods %}
-            <tr>
-              <td><input type="checkbox" class="row-check-current" value="{{ loop.index0 }}"></td>
-              <td>{{ p.year }}-{{ p.sem }}</td>
-              <td>{{ p.name }}</td>
-              <td>{{ p.start }}</td>
-              <td>{{ p.end }}</td>
-              <td>
-                <button type="button" class="btn btn-outline-success btn-sm edit-btn" data-idx="{{ loop.index0 }}" data-year="{{ p.year }}" data-sem="{{ p.sem }}" data-name="{{ p.name }}" data-start="{{ p.start }}" data-end="{{ p.end }}"><i class="bi bi-pencil"></i> 編輯</button>
-                <button type="button" class="btn btn-outline-danger btn-sm delete-btn" data-idx="{{ loop.index0 }}"><i class="bi bi-trash"></i> 刪除</button>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-        <button id="batch-delete-btn-current" class="btn btn-danger mt-2" type="button"><i class="bi bi-trash"></i> 批次刪除</button>
-      </div>
-    </div>
-    <div class="tab-pane fade" id="past" role="tabpanel" aria-labelledby="past-tab">
-      <div class="table-responsive">
-        <table class="table table-bordered table-hover align-middle text-center">
-          <thead class="table-light">
-            <tr>
-              <th><input type="checkbox" id="select-all-past"></th>
-              <th>學年-學期</th><th>時段名稱</th><th>開始</th><th>結束</th><th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for p in past_periods %}
-            <tr>
-              <td><input type="checkbox" class="row-check-past" value="{{ loop.index0 }}"></td>
-              <td>{{ p.year }}-{{ p.sem }}</td>
-              <td>{{ p.name }}</td>
-              <td>{{ p.start }}</td>
-              <td>{{ p.end }}</td>
-              <td>
-                <button type="button" class="btn btn-outline-success btn-sm edit-btn" data-idx="{{ loop.index0 }}" data-year="{{ p.year }}" data-sem="{{ p.sem }}" data-name="{{ p.name }}" data-start="{{ p.start }}" data-end="{{ p.end }}"><i class="bi bi-pencil"></i> 編輯</button>
-                <button type="button" class="btn btn-outline-danger btn-sm delete-btn" data-idx="{{ loop.index0 }}"><i class="bi bi-trash"></i> 刪除</button>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-        <button id="batch-delete-btn-past" class="btn btn-danger mt-2" type="button"><i class="bi bi-trash"></i> 批次刪除</button>
-      </div>
-    </div>
+  <div class="table-responsive">
+    <table class="table table-bordered table-hover align-middle text-center">
+      <thead class="table-light">
+        <tr>
+          <th><input type="checkbox" id="select-all"></th>
+          <th>學年-學期</th><th>時段名稱</th><th>開始</th><th>結束</th><th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in periods %}
+        <tr>
+          <td><input type="checkbox" class="row-check" value="{{ loop.index0 }}"></td>
+          <td>{{ p.year }}-{{ p.sem }}</td>
+          <td>{{ p.name }}</td>
+          <td>{{ p.start }}</td>
+          <td>{{ p.end }}</td>
+          <td>
+            <button type="button" class="btn btn-outline-success btn-sm edit-btn" data-idx="{{ loop.index0 }}" data-year="{{ p.year }}" data-sem="{{ p.sem }}" data-name="{{ p.name }}" data-start="{{ p.start }}" data-end="{{ p.end }}"><i class="bi bi-pencil"></i> 編輯</button>
+            <button type="button" class="btn btn-outline-danger btn-sm delete-btn" data-idx="{{ loop.index0 }}"><i class="bi bi-trash"></i> 刪除</button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <button id="batch-delete-btn" class="btn btn-danger mt-2" type="button"><i class="bi bi-trash"></i> 批次刪除</button>
   </div>
 </div>
 <script>
   let editIdx = null;
   $(document).ready(function() {
     // 全選/全不選
-    $('#select-all-current').on('change', function() {
-      $('.row-check-current').prop('checked', this.checked);
-    });
-    $('#select-all-past').on('change', function() {
-      $('.row-check-past').prop('checked', this.checked);
+    $('#select-all').on('change', function() {
+      $('.row-check').prop('checked', this.checked);
     });
     // 編輯按鈕
     $('.edit-btn').on('click', function() {
@@ -147,17 +104,8 @@
       }
     });
     // 批次刪除
-    $('#batch-delete-btn-current').on('click', function() {
-      let idxs = $('.row-check-current:checked').map(function(){return this.value;}).get();
-      if(idxs.length === 0) { alert('請先勾選要刪除的時段'); return; }
-      if(confirm('確定要批次刪除選取的時段嗎？')) {
-        $('<form method="post" style="display:none;"></form>')
-          .append('<input name="batch_delete" value="'+idxs.join(',')+'">')
-          .appendTo('body').submit();
-      }
-    });
-    $('#batch-delete-btn-past').on('click', function() {
-      let idxs = $('.row-check-past:checked').map(function(){return this.value;}).get();
+    $('#batch-delete-btn').on('click', function() {
+      let idxs = $('.row-check:checked').map(function(){return this.value;}).get();
       if(idxs.length === 0) { alert('請先勾選要刪除的時段'); return; }
       if(confirm('確定要批次刪除選取的時段嗎？')) {
         $('<form method="post" style="display:none;"></form>')
