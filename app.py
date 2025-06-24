@@ -811,6 +811,8 @@ def student_enroll():
     # 取得本班所有必修課
     required_courses = [c for c in courses if c.get('courseType', '') in ['▲', '△'] and any(cls['name'] == class_name_ch for cls in c.get('class', []))]
     required_ids = [str(c['id']) for c in required_courses]
+    all_course_ids = set(my_courses) | set(required_ids)
+    my_credit = sum(float(c.get('credit', 0)) for c in courses if str(c.get('id')) in all_course_ids)
     # 衝堂檢查（已選課+必修課）
     def is_conflict(new_course):
         new_time = new_course.get('time', {})
