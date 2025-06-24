@@ -702,7 +702,40 @@ def admin_enroll_period():
             save_enroll_period(periods)
             write_log(session['user'], '新增選課時段', f"{year}-{sem} {name}")
             msg = f"已新增 {name} 時段（{year}-{sem}）"
-    return render_template('enroll_period.html', user=user, years=years, sems=sems, periods=periods, msg=msg)
+    # 新增分類：進行中與歷史時段
+    from datetime import datetime
+    def date_to_number(date_str):
+        try:
+            if '/' in date_str:
+                month, day = map(int, date_str.split('/'))
+            else:
+                date_int = int(date_str)
+                if date_int < 32:
+                    month = datetime.now().month
+                    day = date_int
+                elif date_int < 1000:
+                    month = date_int // 100
+                    day = date_int % 100
+                else:
+                    month = date_int // 100
+                    day = date_int % 100
+            if 1 <= month <= 12 and 1 <= day <= 31:
+                return month * 100 + day
+            else:
+                return 0
+        except:
+            return 0
+    today_num = date_to_number(datetime.now().strftime('%m/%d'))
+    current_periods = []
+    past_periods = []
+    for p in periods:
+        start_num = date_to_number(p['start'])
+        end_num = date_to_number(p['end'])
+        if start_num <= today_num <= end_num:
+            current_periods.append(p)
+        elif end_num < today_num:
+            past_periods.append(p)
+    return render_template('enroll_period.html', user=user, years=years, sems=sems, current_periods=current_periods, past_periods=past_periods, msg=msg)
 
 ENROLL_RECORD_FILE = os.path.join(os.path.dirname(__file__), 'data', 'enroll_record.json')
 def load_enroll_record():
