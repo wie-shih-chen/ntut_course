@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}{{ course.name.zh }} 課程詳情{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="fw-bold mb-3"><i class="bi bi-info-circle me-2"></i>{{ course.name.zh }} <span class="fs-5 text-secondary">({{ course.name.en }})</span></h2>
+  <a href="/admin" class="btn btn-outline-secondary mb-3"><i class="bi bi-arrow-left"></i> 返回管理員主控台</a>
+  <div class="card shadow-sm mb-4 border-0">
+    <div class="card-body">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><b>課程代碼：</b><span class="text-primary">{{ course.code }}</span></li>
+        <li class="list-group-item"><b>老師：</b>
+          {% for t in course.teacher %}
+            <span class="badge bg-secondary bg-opacity-75 me-1"><i class="bi bi-person me-1"></i>{{ t.name }}</span>{% if not loop.last %}{% endif %}
+          {% endfor %}
+        </li>
+        <li class="list-group-item"><b>時間：</b><span class="ms-1"><i class="bi bi-clock me-1"></i>{{ course.time | to_readable_time }}</span></li>
+        <li class="list-group-item"><b>地點：</b>
+          {% for c in course.classroom %}
+            <span class="badge bg-info bg-opacity-50 me-1"><i class="bi bi-geo-alt me-1"></i>{{ c.name }}</span>{% if not loop.last %}{% endif %}
+          {% endfor %}
+        </li>
+        <li class="list-group-item"><b>學分：</b><span class="badge bg-success bg-opacity-75 ms-1">{{ course.credit }}</span></li>
+        <li class="list-group-item"><b>類型：</b>
+          {% if course.courseType == '▲' or course.courseType == '△' %}
+            <span class="badge bg-primary bg-opacity-75">必修</span>
+          {% else %}
+            <span class="badge bg-secondary bg-opacity-50">選修</span>
+          {% endif %}
+        </li>
+        <li class="list-group-item"><b>人數：</b><span class="ms-1">{{ course.people }}</span></li>
+        <li class="list-group-item"><b>備註：</b><span class="ms-1 text-muted">{{ course.notes }}</span></li>
+        <li class="list-group-item"><b>課程說明：</b><div class="mt-1">{{ course.description.zh }}</div></li>
+      </ul>
+    </div>
+  </div>
+  <div class="text-muted mt-3" style="font-size:15px;">（可於此頁檢視課程詳細資訊，後續可加入編輯、刪除、加選/退選等功能）</div>
+</div>
+{% endblock %} 

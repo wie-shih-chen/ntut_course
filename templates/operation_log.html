@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}操作日誌查詢{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-4">操作日誌查詢</h2>
+  <div class="table-responsive">
+    <table class="table table-bordered table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>時間</th>
+          <th>帳號</th>
+          <th>動作</th>
+          <th>目標</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for line in logs|reverse %}
+        {% set parts = line.split('] ', 1) %}
+        {% if parts|length == 2 %}
+          {% set time = parts[0][1:] %}
+          {% set rest = parts[1].split(': ', 1) %}
+          {% if rest|length == 2 %}
+            {% set user = rest[0] %}
+            {% set action_target = rest[1].split(' ', 1) %}
+            <tr>
+              <td>{{ time }}</td>
+              <td>{{ user }}</td>
+              <td>{{ action_target[0] }}</td>
+              <td>{{ action_target[1] if action_target|length > 1 else '' }}</td>
+            </tr>
+          {% endif %}
+        {% endif %}
+        {% else %}
+        <tr><td colspan="4" class="text-center">尚無操作紀錄</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary mt-3">返回主控台</a>
+</div>
+{% endblock %} 

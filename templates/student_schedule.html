@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% block title %}課表可視化{% endblock %}
+{% block content %}
+<style>
+.course-cell {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  margin-bottom: 4px;
+  padding: 6px 8px;
+  font-weight: 600;
+  font-size: 15px;
+  transition: box-shadow 0.2s, transform 0.2s;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+}
+.course-cell.clickable {
+  cursor: pointer;
+}
+.course-cell:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.13);
+  transform: translateY(-2px) scale(1.03);
+  z-index: 2;
+}
+.course-cell.required {
+  background: #2563eb;
+  color: #fff;
+}
+.course-cell.elective {
+  background: #e6f9f0;
+  color: #1a7f3c;
+}
+.course-cell.both {
+  background: #ede9fe;
+  color: #7c2fa0;
+}
+.course-cell .tag {
+  font-size: 11px;
+  margin-left: 4px;
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.18);
+  font-weight: 500;
+}
+</style>
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="fw-bold mb-0"><i class="bi bi-calendar-week me-2"></i>課表查詢</h2>
+    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left me-1"></i>返回首頁
+    </a>
+  </div>
+  <!-- 學生資訊 -->
+  <div class="mb-3 p-3 bg-white rounded shadow-sm d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2">
+    <div class="fw-bold fs-5 text-primary">
+      <i class="bi bi-person-circle me-2"></i>
+      {{ user.id or user.student_id }}
+    </div>
+    <div class="fw-bold">班級：<span class="text-dark">{{ class_name }}</span></div>
+  </div>
+  <!-- 學年學期切換表單 -->
+  <form method="get" class="row g-2 align-items-center mb-3">
+    <div class="col-auto">
+      <label for="year" class="form-label mb-0">學年：</label>
+      <select name="year" id="year" class="form-select">
+        {% for y in years %}
+        <option value="{{ y }}" {% if y==year %}selected{% endif %}>{{ y }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-auto">
+      <label for="sem" class="form-label mb-0">學期：</label>
+      <select name="sem" id="sem" class="form-select">
+        {% for s in sems %}
+        <option value="{{ s }}" {% if s==sem %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-auto">
+      <button type="submit" class="btn btn-outline-primary">切換</button>
+    </div>
+  </form>
+  {% if msg %}
+    <div class="alert {% if '成功' in msg %}alert-success{% elif '錯' in msg or '衝堂' in msg or '超過' in msg %}alert-danger{% else %}alert-warning{% endif %} fw-bold">{{ msg }}</div>
+  {% endif %}
+  <!-- 可視化課表 -->
+  <div class="table-responsive mb-3">
+    <table class="table table-bordered align-middle text-center shadow-sm">
+      <thead class="table-light">
+        <tr>
+          <th>節次/星期</th>
+          <th>一</th>
+          <th>二</th>
+          <th>三</th>
+          <th>四</th>
+          <th>五</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for section in range(1, 15) %}
+        <tr>
+          <td class="fw-bold">第{{ section }}節</td>
+          {% for day in ['mon','tue','wed','thu','fri'] %}
+          <td style="min-width:110px;">
+            {% for item in table[day][section|string] %}
+              {% if item.type == '必修' %}
+                <div class="course-cell required{% if item.id %} clickable{% endif %}">
+                  {% if item.id %}
+                    <a href="/course/{{ item.id }}?year={{ year }}&sem={{ sem }}&class_name={{ class_name }}" class="d-block text-decoration-none text-white w-100">
+                      {{ item.name }} <span class="tag">必修</span>
+                    </a>
+                  {% else %}
+                    <span>{{ item.name }} <span class="tag">必修</span></span>
+                  {% endif %}
+                </div>
+              {% elif item.type == '選課' %}
+                <div class="course-cell elective{% if item.id %} clickable{% endif %}">
+                  {% if item.id %}
+                    <a href="/course/{{ item.id }}?year={{ year }}&sem={{ sem }}&class_name={{ class_name }}" class="d-block text-decoration-none w-100" style="color:#1a7f3c;">
+                      {{ item.name }} <span class="tag">已選</span>
+                    </a>
+                  {% else %}
+                    <span>{{ item.name }} <span class="tag">已選</span></span>
+                  {% endif %}
+                </div>
+              {% elif item.type == '必修+選課' %}
+                <div class="course-cell both{% if item.id %} clickable{% endif %}">
+                  {% if item.id %}
+                    <a href="/course/{{ item.id }}?year={{ year }}&sem={{ sem }}&class_name={{ class_name }}" class="d-block text-decoration-none w-100" style="color:#7c2fa0;">
+                      {{ item.name }} <span class="tag">必修+已選</span>
+                    </a>
+                  {% else %}
+                    <span>{{ item.name }} <span class="tag">必修+已選</span></span>
+                  {% endif %}
+                </div>
+              {% endif %}
+            {% endfor %}
+          </td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <!-- 顏色說明 -->
+  <div class="mb-3">
+    <span style="background:#e3f0ff;color:#155fa0;border-radius:4px;padding:2px 6px;">必修</span>
+    <span style="background:#eaffea;color:#1a7f3c;border-radius:4px;padding:2px 6px;">已選</span>
+    <span style="background:#f3e6ff;color:#7c2fa0;border-radius:4px;padding:2px 6px;">必修+已選</span>
+    <span style="margin-left:10px;color:#888;font-size:13px;">（顏色說明）</span>
+  </div>
+  <!-- 匯出課表按鈕 -->
+  <div class="mb-4 text-end">
+    <a href="/student/export?year={{ year }}&sem={{ sem }}" class="btn btn-outline-success"><i class="bi bi-file-earmark-arrow-down me-1"></i>匯出課表</a>
+  </div>
+  <!-- 已選課程清單 -->
+  <h4 class="mb-2">已選課程清單</h4>
+  <ul class="list-group mb-4">
+    {% for c in my_course_objs %}
+    <li class="list-group-item">{{ c.name.zh }}（{{ c.credit }}學分）</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %} 

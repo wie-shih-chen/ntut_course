@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block title %}學生首頁{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <!-- 通知區塊 -->
+  <div class="card shadow-sm mb-4 p-3">
+    <div class="row align-items-center">
+      <div class="col-md-2 text-center">
+        <i class="bi bi-bell-fill fs-1 text-primary"></i>
+        <div class="fw-bold text-primary mt-2">選課狀態通知</div>
+      </div>
+      <div class="col-md-7">
+        <div class="row text-center">
+          <div class="col-6 col-md-3 border-end">
+            <div class="small text-muted">選課時段</div>
+            <div class="fw-bold">{% if can_enroll %}<span class="text-success">開放中</span>{% else %}<span class="text-danger">未開放</span>{% endif %}</div>
+            {% if period and period.start and period.end %}
+              <div class="small text-secondary mt-1" style="font-size:13px;">{{ period.start }} ~ {{ period.end }}</div>
+            {% endif %}
+          </div>
+          <div class="col-6 col-md-3 border-end">
+            <div class="small text-muted">學年學期</div>
+            <div class="fw-bold">{{ year }}-{{ sem }}</div>
+          </div>
+          <div class="col-6 col-md-3 border-end">
+            <div class="small text-muted">班級</div>
+            <div class="fw-bold">{{ class_name }}</div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="small text-muted">已選學分</div>
+            <div class="fw-bold">{{ my_credit }}/{{ MAX_CREDIT }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 text-end">
+        <span class="badge {% if can_enroll %}bg-success{% else %}bg-danger{% endif %} fs-6 px-3 py-2 mb-2">
+          <i class="bi {% if can_enroll %}bi-check-circle{% else %}bi-x-circle{% endif %} me-1"></i>
+          {% if can_enroll %}可選課{% else %}不可選課{% endif %}
+        </span>
+        <div class="small text-muted">
+          <i class="bi bi-clock me-1"></i>更新時間：<span id="current-time"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 三大功能 -->
+  <div class="row g-4 mb-4">
+    <div class="col-md-4">
+      <div class="card h-100 border-0 shadow-sm text-center p-4">
+        <i class="bi bi-journal-text fs-1 text-primary mb-3"></i>
+        <h5 class="fw-bold">選課系統</h5>
+        <p class="text-muted small">查詢課程、選課、退選</p>
+        <a href="{{ url_for('student_enroll') }}" class="btn btn-primary btn-sm w-75 mx-auto">進入選課</a>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card h-100 border-0 shadow-sm text-center p-4">
+        <i class="bi bi-calendar-week fs-1 text-success mb-3"></i>
+        <h5 class="fw-bold">課表查詢</h5>
+        <p class="text-muted small">查看個人課表</p>
+        <a href="{{ url_for('student_schedule') }}" class="btn btn-success btn-sm w-75 mx-auto">查看課表</a>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card h-100 border-0 shadow-sm text-center p-4">
+        <i class="bi bi-box-arrow-right fs-1 text-secondary mb-3"></i>
+        <h5 class="fw-bold">登出</h5>
+        <p class="text-muted small">安全登出系統</p>
+        <a href="{{ url_for('logout') }}" class="btn btn-secondary btn-sm w-75 mx-auto">登出</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 下方兩欄 -->
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-light fw-bold"><i class="bi bi-lightning-charge me-2"></i>快速選課</div>
+        <div class="card-body d-flex flex-wrap gap-2">
+          <a href="{{ url_for('student_enroll', tab='通識') }}" class="btn btn-outline-primary flex-fill"><i class="bi bi-book me-1"></i>通識課程</a>
+          <a href="{{ url_for('student_enroll', tab='體育') }}" class="btn btn-outline-success flex-fill"><i class="bi bi-heart-pulse me-1"></i>體育課程</a>
+          <a href="{{ url_for('student_enroll', tab='語言') }}" class="btn btn-outline-info flex-fill"><i class="bi bi-translate me-1"></i>語言課程</a>
+          <a href="{{ url_for('student_enroll', tab='選修') }}" class="btn btn-outline-warning flex-fill"><i class="bi bi-star me-1"></i>選修課程</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-light fw-bold"><i class="bi bi-info-circle me-2"></i>系統資訊</div>
+        <div class="card-body">
+          <ul class="list-unstyled mb-0">
+            <li class="mb-2"><i class="bi bi-person me-2 text-primary"></i><strong>學生：</strong>{{ user.name }}</li>
+            <li class="mb-2"><i class="bi bi-person-badge me-2 text-warning"></i><strong>學號：</strong>{{ user.student_id }}</li>
+            <li class="mb-2"><i class="bi bi-people me-2 text-success"></i><strong>班級：</strong>{{ class_name }}</li>
+            <li class="mb-2"><i class="bi bi-calendar me-2 text-info"></i><strong>學年：</strong>{{ year }}-{{ sem }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  // 顯示當前時間
+  function updateTime() {
+    const now = new Date();
+    const timeStr = (now.getMonth() + 1).toString().padStart(2, '0') + '/' +
+                    now.getDate().toString().padStart(2, '0') + ' ' +
+                    now.getHours().toString().padStart(2, '0') + ':' +
+                    now.getMinutes().toString().padStart(2, '0');
+    document.getElementById('current-time').textContent = timeStr;
+  }
+  updateTime();
+  setInterval(updateTime, 60000);
+</script>
+{% endblock %} 

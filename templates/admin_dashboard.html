@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}管理員主控台{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex flex-wrap align-items-center justify-content-between mb-3">
+    <h2 class="fw-bold mb-0"><i class="bi bi-speedometer2 me-2"></i>管理員主控台</h2>
+    <span class="text-secondary">歡迎，{{ user.name }}（管理員）</span>
+  </div>
+  <div class="row g-4 mb-4">
+    <div class="col-6 col-md-3">
+      <a href="/admin/users" class="text-decoration-none">
+        <div class="card h-100 shadow-sm text-center p-3 border-0 hover-shadow">
+          <div class="mb-2" style="font-size:2.2em;"><i class="bi bi-people"></i></div>
+          <div class="fw-bold">使用者管理</div>
+        </div>
+      </a>
+    </div>
+    <div class="col-6 col-md-3">
+      <a href="/admin/enroll_period" class="text-decoration-none">
+        <div class="card h-100 shadow-sm text-center p-3 border-0 hover-shadow">
+          <div class="mb-2" style="font-size:2.2em;"><i class="bi bi-calendar-week"></i></div>
+          <div class="fw-bold">選課時段設定</div>
+        </div>
+      </a>
+    </div>
+    <div class="col-6 col-md-3">
+      <a href="/admin/enroll_record" class="text-decoration-none">
+        <div class="card h-100 shadow-sm text-center p-3 border-0 hover-shadow">
+          <div class="mb-2" style="font-size:2.2em;"><i class="bi bi-clipboard-data"></i></div>
+          <div class="fw-bold">學生選課紀錄查詢</div>
+        </div>
+      </a>
+    </div>
+    <div class="col-6 col-md-3">
+      <a href="/admin/login_log" class="text-decoration-none">
+        <div class="card h-100 shadow-sm text-center p-3 border-0 hover-shadow">
+          <div class="mb-2" style="font-size:2.2em;"><i class="bi bi-shield-lock"></i></div>
+          <div class="fw-bold">登入日誌</div>
+        </div>
+      </a>
+    </div>
+    <div class="col-6 col-md-3">
+      <a href="/admin/course_search" class="text-decoration-none">
+        <div class="card h-100 shadow-sm text-center p-3 border-0 hover-shadow">
+          <div class="mb-2" style="font-size:2.2em;"><i class="bi bi-search"></i></div>
+          <div class="fw-bold">課程查詢</div>
+        </div>
+      </a>
+    </div>
+  </div>
+  {% if msg %}
+    {% set msg_type = 'msg-success' if '成功' in msg else 'msg-error' if '錯' in msg or '衝堂' in msg or '超過' in msg else 'msg-warn' %}
+    <div class="alert alert-info fw-bold">{{ msg }}</div>
+  {% endif %}
+  <div class="text-muted mt-4" style="font-size:15px;">（後續會加入更多可視化、匯出、管理等功能）</div>
+</div>
+{% endblock %} 

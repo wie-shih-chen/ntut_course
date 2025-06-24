@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-4 fw-bold text-primary"><i class="bi bi-table me-2"></i>課表可視化（管理員）</h2>
+  <form method="get" class="row g-2 align-items-center mb-4">
+    <div class="col-auto">
+      <label class="form-label mb-0">學號：</label>
+      <input type="text" name="student_id" class="form-control" placeholder="請輸入學號" value="{{ student_id|default('') }}">
+    </div>
+    <div class="col-auto">
+      <label class="form-label mb-0">學年：</label>
+      <select name="year" class="form-select">
+        {% for y in years %}
+        <option value="{{ y }}" {% if y == year %}selected{% endif %}>{{ y }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-auto">
+      <label class="form-label mb-0">學期：</label>
+      <select name="sem" class="form-select">
+        <option value="1" {% if sem == '1' %}selected{% endif %}>1</option>
+        <option value="2" {% if sem == '2' %}selected{% endif %}>2</option>
+      </select>
+    </div>
+    <div class="col-auto">
+      <button type="submit" class="btn btn-primary"><i class="bi bi-search me-1"></i>查詢課表</button>
+    </div>
+  </form>
+  {% if table %}
+  <div class="table-responsive">
+    <table class="table table-bordered text-center align-middle shadow-sm">
+      <thead class="table-light">
+        <tr>
+          <th>\</th>
+          {% for d in days %}
+          <th>{{ d }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in sections %}
+        <tr>
+          <th>{{ s }}</th>
+          {% for d in days %}
+          <td style="min-width: 110px;">
+            {% if table[d][s] %}
+              {% for item in table[d][s] %}
+                {% if item.type == '必修' %}
+                  <div class="bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 rounded mb-1 p-1 small fw-bold">
+                    <i class="bi bi-book me-1"></i>{{ item.name }} <span class="badge bg-primary bg-opacity-75 ms-1" style="font-size:11px;">必修</span>
+                  </div>
+                {% elif item.type == '選課' %}
+                  <div class="bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded mb-1 p-1 small fw-bold">
+                    <i class="bi bi-check2-circle me-1"></i>{{ item.name }} <span class="badge bg-success bg-opacity-75 ms-1" style="font-size:11px;">已選</span>
+                  </div>
+                {% elif item.type == '必修+選課' %}
+                  <div class="bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 rounded mb-1 p-1 small fw-bold">
+                    <i class="bi bi-star me-1"></i>{{ item.name }} <span class="badge bg-warning bg-opacity-75 ms-1 text-dark" style="font-size:11px;">必修+已選</span>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+          </td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="mb-2">
+    <span class="bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 rounded px-2 py-1 me-2" style="font-size:13px;">必修</span>
+    <span class="bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded px-2 py-1 me-2" style="font-size:13px;">已選</span>
+    <span class="bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 rounded px-2 py-1 me-2" style="font-size:13px;">必修+已選</span>
+    <span class="text-muted" style="font-size:13px;">（顏色說明）</span>
+  </div>
+  {% elif student_id %}
+    <div class="alert alert-warning mt-3"><i class="bi bi-exclamation-triangle me-1"></i>查無課表資料，請確認學號與學年學期。</div>
+  {% endif %}
+</div>
+{% endblock %} 

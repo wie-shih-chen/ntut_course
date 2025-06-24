@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}登入{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+  <div class="card shadow p-4" style="min-width:340px;max-width:400px;width:100%;">
+    <h2 class="fw-bold text-center mb-4"><i class="bi bi-box-arrow-in-right me-2"></i>登入</h2>
+    <form method="post">
+      <div class="mb-3">
+        <label for="username" class="form-label">帳號</label>
+        <input type="text" id="username" name="username" class="form-control" required autofocus>
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label">密碼</label>
+        <input type="password" id="password" name="password" class="form-control" required>
+      </div>
+      <button type="submit" class="btn btn-primary w-100 mb-2">登入</button>
+    </form>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="alert alert-danger mt-3 mb-0" role="alert">
+          {% for message in messages %}{{ message }}<br>{% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    {% if user and user.role == 'admin' %}
+    <div class="text-end mb-2">
+      <a href="{{ url_for('admin_login_log') }}" class="btn btn-outline-secondary btn-sm">登入日誌</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %} 

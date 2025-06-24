@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>使用者管理</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container py-4">
+    <h2 class="mb-3 fw-bold">使用者管理</h2>
+    <a href="/admin" class="btn btn-outline-secondary mb-3">返回管理員首頁</a>
+    <hr class="mb-4">
+    <div class="mb-4">
+        <h4 class="mb-3">新增單一學生</h4>
+        <form method="post" action="/admin/users/add" class="row g-2 align-items-center">
+            <div class="col-md-3">
+                <label class="form-label mb-0">學號：</label>
+                <input type="text" name="student_id" class="form-control" required placeholder="如113650001">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label mb-0">姓名：</label>
+                <input type="text" name="name" class="form-control" required placeholder="學生姓名">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label mb-0">密碼：</label>
+                <input type="text" name="password" class="form-control" required placeholder="預設密碼">
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-success w-100">新增學生</button>
+            </div>
+        </form>
+    </div>
+    <div class="mb-4">
+        <h4 class="mb-3">批量新增學生</h4>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#autoBulkAddModal">批量新增學生</button>
+    </div>
+    <!-- 批量新增學生 Modal -->
+    <div class="modal fade" id="autoBulkAddModal" tabindex="-1" aria-labelledby="autoBulkAddModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form method="post" action="/admin/users/batch_add" enctype="multipart/form-data" onsubmit="return confirmBatchAdd();">
+            <div class="modal-header">
+              <h5 class="modal-title" id="autoBulkAddModalLabel">批量新增學生</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label class="form-label">學年度：</label>
+                <input type="text" class="form-control" name="year" placeholder="如 113" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">科系代號：</label>
+                <input type="text" class="form-control" name="dept_code" placeholder="如 6500" required>
+              </div>
+              <div class="mb-3 row">
+                <div class="col">
+                  <label class="form-label">起始號碼：</label>
+                  <input type="text" class="form-control" name="start_no" placeholder="如 01" required>
+                </div>
+                <div class="col">
+                  <label class="form-label">結束號碼：</label>
+                  <input type="text" class="form-control" name="end_no" placeholder="如 30" required>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">預設密碼：</label>
+                <input type="text" class="form-control" name="password" value="12345678" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">或上傳 CSV 檔：</label>
+                <input type="file" class="form-control" name="csv_file" accept=".csv">
+              </div>
+              <div class="form-text">兩者都填會同時執行，至少擇一。</div>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-success">送出</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <div class="d-flex align-items-center gap-3">
+        <h4 class="mb-0">學生清單</h4>
+        <input type="text" id="studentSearchInput" class="form-control w-auto" style="min-width:220px;" placeholder="搜尋學號、姓名或班級" oninput="filterStudentTable()">
+      </div>
+      <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">刪除</button>
+    </div>
+    <table class="table table-striped table-bordered table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>學號</th>
+                <th>姓名</th>
+                <th>班級</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in students %}
+            <tr>
+                <td>{{ s.student_id }}</td>
+                <td>{{ s.name }}</td>
+                <td>{{ s.class }}</td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editModal{{ s.student_id }}">編輯資料</button>
+                </td>
+            </tr>
+            <!-- 編輯學生 Modal -->
+            <div class="modal fade" id="editModal{{ s.student_id }}" tabindex="-1" aria-labelledby="editModalLabel{{ s.student_id }}" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <form method="post" action="/admin/users/edit/{{ s.student_id }}">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="editModalLabel{{ s.student_id }}">編輯學生資料</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <div class="mb-2">
+                        <label>學號：</label>
+                        <input type="text" class="form-control" value="{{ s.student_id }}" readonly>
+                      </div>
+                      <div class="mb-2">
+                        <label>姓名：</label>
+                        <input type="text" name="name" class="form-control" value="{{ s.name }}" required>
+                      </div>
+                      <div class="mb-2">
+                        <label>密碼（留空則不變）：</label>
+                        <input type="text" name="password" class="form-control" placeholder="如需修改請輸入新密碼">
+                      </div>
+                      <div class="mb-2">
+                        <label>班級：</label>
+                        <input type="text" class="form-control" value="{{ s.class }}" readonly>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                      <button type="submit" class="btn btn-success">儲存變更</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+        </tbody>
+    </table>
+    <!-- 批量刪除 Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deleteModalLabel">確定要刪除選取的學生嗎？此操作無法復原！</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form id="batchDeleteForm" method="post" action="/admin/users/batch_delete" onsubmit="return confirmBatchDelete();">
+            <div class="modal-body">
+              <!-- 快速選取區間表單（橫向排列） -->
+              <div class="row g-2 align-items-end mb-3" id="quickSelectForm">
+                <div class="col-2">
+                  <label class="form-label mb-0">學年度</label>
+                  <input type="text" class="form-control" id="del_year" placeholder="113">
+                </div>
+                <div class="col-3">
+                  <label class="form-label mb-0">科系代號</label>
+                  <input type="text" class="form-control" id="del_dept" placeholder="6500">
+                </div>
+                <div class="col-3">
+                  <label class="form-label mb-0">起始號碼</label>
+                  <input type="text" class="form-control" id="del_start" placeholder="01">
+                </div>
+                <div class="col-3">
+                  <label class="form-label mb-0">結束號碼</label>
+                  <input type="text" class="form-control" id="del_end" placeholder="30">
+                </div>
+                <div class="col-auto">
+                  <button type="button" class="btn btn-outline-primary" onclick="quickSelectDelete()">快速選取</button>
+                </div>
+              </div>
+              <hr>
+              <!-- 學生多選表格加捲動條 -->
+              <div style="max-height: 350px; overflow-y: auto;">
+                <table class="table table-hover align-middle">
+                  <thead>
+                    <tr>
+                      <th scope="col"><input type="checkbox" id="selectAllModal"></th>
+                      <th scope="col">學號</th>
+                      <th scope="col">姓名</th>
+                      <th scope="col">班級</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for s in students %}
+                    <tr>
+                      <td><input type="checkbox" name="student_ids" value="{{ s.student_id }}"></td>
+                      <td>{{ s.student_id }}</td>
+                      <td>{{ s.name }}</td>
+                      <td>{{ s.class }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+                <div class="text-danger mt-2" id="selectedCount"></div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-danger">確定刪除</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="mt-3">
+        {% for message in messages %}
+          <div class="alert alert-info alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function toggleSelectAll(source) {
+    const checkboxes = document.querySelectorAll('input[name="student_ids"]');
+    for (const cb of checkboxes) {
+        cb.checked = source.checked;
+    }
+}
+function confirmDelete(student_id) {
+    return confirm('確定要刪除學生 ' + student_id + ' 嗎？此操作無法復原！');
+}
+function confirmReset(student_id) {
+    return confirm('確定要重設 ' + student_id + ' 的密碼為 12345678 嗎？');
+}
+function confirmBatchAdd() {
+    return confirm('確定要批量新增這些學生嗎？（自動產生與CSV匯入會同時執行）');
+}
+function confirmBatchDelete() {
+    const checked = document.querySelectorAll('input[name="student_ids"]:checked');
+    if (checked.length === 0) {
+        alert('請先勾選要刪除的學生！');
+        return false;
+    }
+    return confirm('確定要刪除選取的學生嗎？此操作無法復原！');
+}
+function quickSelectDelete() {
+  const year = document.getElementById('del_year').value.trim();
+  const dept = document.getElementById('del_dept').value.trim();
+  const start = document.getElementById('del_start').value.trim();
+  const end = document.getElementById('del_end').value.trim();
+  if (!year || !dept || !start || !end) {
+    alert('請完整填寫學年度、科系代號、起始號碼、結束號碼');
+    return;
+  }
+  const startNum = parseInt(start, 10);
+  const endNum = parseInt(end, 10);
+  document.querySelectorAll('#deleteModal input[name="student_ids"]')
+    .forEach(cb => {
+      const sid = cb.value;
+      if (sid.startsWith(year + dept)) {
+        const num = parseInt(sid.slice((year+dept).length), 10);
+        if (num >= startNum && num <= endNum) {
+          cb.checked = true;
+        }
+      }
+    });
+  // 更新選取數量
+  if (typeof updateSelectedCount === 'function') updateSelectedCount();
+}
+document.getElementById('deleteModal').addEventListener('shown.bs.modal', function () {
+  const selectAll = document.getElementById('selectAllModal');
+  const checkboxes = document.querySelectorAll('#deleteModal input[name="student_ids"]');
+  const selectedCount = document.getElementById('selectedCount');
+  function updateSelectedCount() {
+    const count = Array.from(checkboxes).filter(cb => cb.checked).length;
+    selectedCount.textContent = `已選取 ${count} 位學生`;
+  }
+  selectAll.onclick = function() {
+    checkboxes.forEach(cb => cb.checked = selectAll.checked);
+    updateSelectedCount();
+  };
+  checkboxes.forEach(cb => {
+    cb.onclick = updateSelectedCount;
+  });
+  updateSelectedCount();
+});
+function filterStudentTable() {
+  const input = document.getElementById('studentSearchInput').value.trim().toLowerCase();
+  let count = 0;
+  document.querySelectorAll('tbody tr').forEach(row => {
+    const cells = row.querySelectorAll('td');
+    if (cells.length >= 3) {
+      const sid = cells[0].textContent.trim().toLowerCase();
+      const name = cells[1].textContent.trim().toLowerCase();
+      const className = cells[2].textContent.trim().toLowerCase();
+      if (sid.includes(input) || name.includes(input) || className.includes(input)) {
+        row.style.display = '';
+        count++;
+      } else {
+        row.style.display = 'none';
+      }
+    }
+  });
+  // 前端查詢日誌
+  if (input.length > 0) {
+    fetch('/api/query_log', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        source: '前端',
+        keyword: input,
+        result_count: count
+      })
+    });
+  }
+}
+</script>
+</body>
+</html> 

@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% block title %}選課時段設定{% endblock %}
+{% block content %}
+<!-- jQuery CDN for JS event binding -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<div class="container py-4">
+  <h2 class="fw-bold mb-4"><i class="bi bi-calendar-week me-2"></i>選課時段設定</h2>
+  <a href="/admin" class="btn btn-outline-secondary mb-3"><i class="bi bi-arrow-left"></i> 返回管理員首頁</a>
+  {% if msg %}
+    <div class="alert alert-success">{{ msg }}</div>
+  {% endif %}
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <form method="post" class="row g-3 align-items-center">
+        <div class="col-auto">
+          <label for="year" class="form-label mb-0">學年：</label>
+          <input type="text" name="year" id="year" class="form-control" style="width:100px;display:inline-block;" pattern="\d{3}" maxlength="3" required placeholder="如：114" value="{{ period.year if period else '' }}">
+        </div>
+        <div class="col-auto">
+          <label for="sem" class="form-label mb-0">學期：</label>
+          <select name="sem" id="sem" class="form-select" required>
+            <option value="">請選擇學期</option>
+            <option value="1" {% if period and period.sem == '1' %}selected{% endif %}>上學期</option>
+            <option value="2" {% if period and period.sem == '2' %}selected{% endif %}>下學期</option>
+          </select>
+        </div>
+        <div class="col-auto">
+          <label for="start" class="form-label mb-0">開始時間：</label>
+          <input type="text" name="start" id="start" class="form-control" style="width: 100px;" placeholder="MM/DD" pattern="\d{1,2}/\d{1,2}" required value="{{ period.start if period else '' }}">
+        </div>
+        <div class="col-auto">
+          <label for="end" class="form-label mb-0">結束時間：</label>
+          <input type="text" name="end" id="end" class="form-control" style="width: 100px;" placeholder="MM/DD" pattern="\d{1,2}/\d{1,2}" required value="{{ period.end if period else '' }}">
+        </div>
+        <div class="col-auto">
+          <label for="name" class="form-label mb-0">時段名稱：</label>
+          <input list="period-names" name="name" id="name" class="form-control" placeholder="如：初選、加退選、期末預選" required value="{{ period.name if period else '' }}">
+          <datalist id="period-names">
+            <option value="初選">
+            <option value="加退選">
+            <option value="期末預選">
+          </datalist>
+        </div>
+        <div class="col-auto">
+          <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>儲存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <h4 class="mb-3">現有設定</h4>
+  <div class="table-responsive">
+    <table class="table table-bordered table-hover align-middle text-center">
+      <thead class="table-light">
+        <tr>
+          <th><input type="checkbox" id="select-all"></th>
+          <th>學年-學期</th><th>時段名稱</th><th>開始</th><th>結束</th><th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in periods %}
+        <tr>
+          <td><input type="checkbox" class="row-check" value="{{ loop.index0 }}"></td>
+          <td>{{ p.year }}-{{ p.sem }}</td>
+          <td>{{ p.name }}</td>
+          <td>{{ p.start }}</td>
+          <td>{{ p.end }}</td>
+          <td>
+            <button type="button" class="btn btn-outline-success btn-sm edit-btn" data-idx="{{ loop.index0 }}" data-year="{{ p.year }}" data-sem="{{ p.sem }}" data-name="{{ p.name }}" data-start="{{ p.start }}" data-end="{{ p.end }}"><i class="bi bi-pencil"></i> 編輯</button>
+            <button type="button" class="btn btn-outline-danger btn-sm delete-btn" data-idx="{{ loop.index0 }}"><i class="bi bi-trash"></i> 刪除</button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <button id="batch-delete-btn" class="btn btn-danger mt-2" type="button"><i class="bi bi-trash"></i> 批次刪除</button>
+  </div>
+</div>
+<script>
+  let editIdx = null;
+  $(document).ready(function() {
+    // 全選/全不選
+    $('#select-all').on('change', function() {
+      $('.row-check').prop('checked', this.checked);
+    });
+    // 編輯按鈕
+    $('.edit-btn').on('click', function() {
+      $('#year').val($(this).data('year'));
+      $('#sem').val($(this).data('sem'));
+      $('#name').val($(this).data('name'));
+      $('#start').val($(this).data('start'));
+      $('#end').val($(this).data('end'));
+      editIdx = $(this).data('idx');
+      $('#edit-flag').remove();
+      $('<input type="hidden" id="edit-flag" name="edit_idx" value="'+editIdx+'">').appendTo('form');
+      $('form button[type="submit"]').text('儲存編輯');
+    });
+    // 刪除按鈕
+    $('.delete-btn').on('click', function() {
+      if(confirm('確定要刪除此時段嗎？')) {
+        const idx = $(this).data('idx');
+        $('<form method="post" style="display:none;"></form>')
+          .append('<input name="delete_idx" value="'+idx+'">')
+          .appendTo('body').submit();
+      }
+    });
+    // 批次刪除
+    $('#batch-delete-btn').on('click', function() {
+      let idxs = $('.row-check:checked').map(function(){return this.value;}).get();
+      if(idxs.length === 0) { alert('請先勾選要刪除的時段'); return; }
+      if(confirm('確定要批次刪除選取的時段嗎？')) {
+        $('<form method="post" style="display:none;"></form>')
+          .append('<input name="batch_delete" value="'+idxs.join(',')+'">')
+          .appendTo('body').submit();
+      }
+    });
+    // 學年-學期不可重複
+    var existYearSems = [{% for p in periods %}'{{ p.year }}-{{ p.sem }}'{% if not loop.last %}, {% endif %}{% endfor %}];
+    $('#year, #sem').on('change blur', function() {
+      var year = $('#year').val();
+      var sem = $('#sem').val();
+      if (year && sem) {
+        var yearSem = year + '-' + sem;
+        if(existYearSems.includes(yearSem)) {
+          alert('此學年-學期組合已存在，請重新選擇！');
+          $('#year').val('');
+          $('#sem').val('1');
+          return;
+        }
+      }
+      
+      // 檢查是否為過去年度
+      if (year) {
+        var currentYear = new Date().getFullYear() - 1911; // 民國年
+        if (new Date().getMonth() >= 7) { // 8月以後自動進位
+          currentYear += 1;
+        }
+        if (parseInt(year) < currentYear) {
+          if (confirm('您輸入的是過去學年度，確定要繼續嗎？')) {
+            $('#year').val(''); // 清空欄位讓用戶重新輸入
+          } else {
+            $('#year').val(''); // 取消也清空欄位
+          }
+        }
+      }
+    });
+  });
+</script>
+{% endblock %} 

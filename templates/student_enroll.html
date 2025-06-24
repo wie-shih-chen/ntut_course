@@ -1,0 +1,313 @@
+{% extends 'base.html' %}
+{% block title %}學生選課{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="fw-bold mb-3"><i class="bi bi-journal-text me-2"></i>學生選課系統</h2>
+  <a href="{{ url_for('index') }}" class="btn btn-outline-secondary mb-3"><i class="bi bi-arrow-left"></i> 返回首頁</a>
+  <!-- 新增選課時段分頁籤 -->
+  <ul class="nav nav-tabs mb-3" id="periodTab" role="tablist">
+    <li class="nav-item">
+      <button class="nav-link active" id="ongoing-tab" data-bs-toggle="tab" data-bs-target="#ongoing" type="button">進行中時段</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button">歷史時段</button>
+    </li>
+  </ul>
+  <div class="tab-content mb-4">
+    <div class="tab-pane fade show active" id="ongoing" role="tabpanel">
+      <div id="ongoing-list"></div>
+    </div>
+    <div class="tab-pane fade" id="history" role="tabpanel">
+      <div id="history-list"></div>
+    </div>
+  </div>
+  <script>
+  fetch('/api/enroll_periods')
+    .then(r => r.json())
+    .then(data => {
+      renderPeriods('ongoing', data.ongoing);
+      renderPeriods('history', data.history);
+    });
+  function renderPeriods(type, periods) {
+    const container = document.getElementById(type + '-list');
+    if (!container) return;
+    if (!periods.length) {
+      container.innerHTML = '<div class="text-muted">無資料</div>';
+      return;
+    }
+    container.innerHTML = periods.map(p =>
+      `<div class="card mb-2 p-2 d-flex flex-row align-items-center justify-content-between">
+        <div>
+          <span class="fw-bold">${p.year}-${p.sem} ${p.name}</span>
+          <span class="text-muted small ms-2">${p.start} ~ ${p.end}</span>
+        </div>
+        <div>
+          ${type === 'ongoing' ? `<a href="?year=${p.year}&sem=${p.sem}" class="btn btn-primary btn-sm">選課</a>` : `<a href="/admin/enroll_record?year=${p.year}&sem=${p.sem}" class="btn btn-outline-info btn-sm">查詢紀錄</a>`}
+        </div>
+      </div>`
+    ).join('');
+  }
+  </script>
+  <form method="get" class="row g-2 align-items-center mb-3">
+    <div class="col-auto">
+      <label for="year" class="form-label mb-0">學年：</label>
+      <select name="year" id="year" class="form-select">
+        {% for y in years %}
+        <option value="{{ y }}" {% if y==year %}selected{% endif %}>{{ y }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-auto">
+      <label for="sem" class="form-label mb-0">學期：</label>
+      <select name="sem" id="sem" class="form-select">
+        {% for s in sems %}
+        <option value="{{ s }}" {% if s==sem %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-auto">
+      <button type="submit" class="btn btn-primary">切換</button>
+    </div>
+  </form>
+  <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+    {% for t in ['通識','體育','語言','選修'] %}
+      <a href="?year={{ year }}&sem={{ sem }}&tab={{ t }}" class="btn {% if tab==t %}btn-primary{% else %}btn-outline-primary{% endif %} btn-sm">{{ t }}</a>
+    {% endfor %}
+    <a href="/student/export?year={{ year }}&sem={{ sem }}" class="btn btn-outline-success btn-sm ms-2"><i class="bi bi-file-earmark-arrow-down me-1"></i>匯出課表</a>
+  </div>
+  <div class="mb-2">目前學分：<span class="fw-bold text-success">{{ my_credit }}</span> / <span class="fw-bold">{{ MAX_CREDIT }}</span></div>
+
+  <!-- 通知框框 -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-3">
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <div class="d-flex align-items-center mb-2">
+            <i class="bi bi-bell-fill text-primary me-2 fs-5"></i>
+            <h6 class="mb-0 fw-bold text-primary">選課狀態通知</h6>
+          </div>
+          <div class="row g-2">
+            <div class="col-sm-6">
+              <div class="d-flex align-items-center">
+                <i class="bi {% if can_enroll %}bi-check-circle-fill text-success{% else %}bi-x-circle-fill text-danger{% endif %} me-2"></i>
+                <span class="small">選課時段：<strong>{% if can_enroll %}開放中{% else %}未開放{% endif %}</strong></span>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="d-flex align-items-center">
+                <i class="bi bi-calendar-check me-2 text-info"></i>
+                <span class="small">學年學期：<strong>{{ year }}-{{ sem }}</strong></span>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="d-flex align-items-center">
+                <i class="bi bi-person-badge me-2 text-warning"></i>
+                <span class="small">班級：<strong>{{ class_name }}</strong></span>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="d-flex align-items-center">
+                <i class="bi bi-bookmark-star me-2 text-success"></i>
+                <span class="small">已選學分：<strong>{{ my_credit }}/{{ MAX_CREDIT }}</strong></span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 text-end">
+          <div class="d-flex flex-column align-items-end">
+            <div class="mb-2">
+              <span class="badge {% if can_enroll %}bg-success{% else %}bg-danger{% endif %} fs-6 px-3 py-2">
+                <i class="bi {% if can_enroll %}bi-check-circle{% else %}bi-x-circle{% endif %} me-1"></i>
+                {% if can_enroll %}可選課{% else %}不可選課{% endif %}
+              </span>
+            </div>
+            <div class="small text-muted">
+              <i class="bi bi-clock me-1"></i>更新時間：<span id="current-time"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if not can_enroll %}
+    <div class="alert alert-warning py-2"><i class="bi bi-exclamation-triangle me-1"></i>非選課時段，僅可查詢</div>
+  {% endif %}
+  {% if msg %}
+    <div class="alert {% if '成功' in msg %}alert-success{% elif '錯' in msg or '衝堂' in msg or '超過' in msg %}alert-danger{% else %}alert-warning{% endif %} fw-bold"><i class="bi bi-info-circle me-1"></i>{{ msg }}</div>
+  {% endif %}
+
+  <!-- 衝堂提示 Modal -->
+  <div class="modal fade" id="conflictModal" tabindex="-1" aria-labelledby="conflictModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title" id="conflictModalLabel"><i class="bi bi-exclamation-triangle me-2"></i>衝堂警告</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="關閉"></button>
+        </div>
+        <div class="modal-body" id="conflictModalBody">
+          <!-- 錯誤訊息會自動填入 -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">關閉</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if msg and '衝堂' in msg %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      alert({{ msg|tojson }});
+    });
+  </script>
+  {% endif %}
+
+  <h4 class="mt-4 mb-2">【{{ tab }}】課程</h4>
+  <form method="post">
+    <div class="table-responsive mb-4">
+      <table class="table table-bordered table-hover align-middle text-center shadow-sm">
+        <thead class="table-light">
+          <tr><th>課程名稱</th><th>老師</th><th>時間</th><th>學分</th><th>操作</th></tr>
+        </thead>
+        <tbody>
+          {% for c in tab_courses[tab] %}
+          <tr>
+            <td class="text-start"><i class="bi bi-book me-1"></i>{{ c.name.zh }}</td>
+            <td>{% for t in c.teacher %}<span class="badge bg-secondary bg-opacity-75 me-1"><i class="bi bi-person me-1"></i>{{ t.name }}</span>{% endfor %}</td>
+            <td><i class="bi bi-clock me-1"></i>{{ c.time|to_readable_time }}</td>
+            <td><span class="badge bg-success bg-opacity-75">{{ c.credit }}</span></td>
+            <td>
+              {% if c.id|string in my_courses %}
+                <button name="drop_id" value="{{ c.id }}" class="btn btn-outline-danger btn-sm" {% if not can_enroll %}disabled{% endif %}><i class="bi bi-x-circle"></i> 退選</button>
+              {% else %}
+                <button name="add_id" value="{{ c.id }}" class="btn btn-primary btn-sm" {% if not can_enroll %}disabled{% endif %}><i class="bi bi-plus-circle"></i> 選課</button>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </form>
+  <h4 class="mb-2">已選課程</h4>
+  <div class="table-responsive">
+    <table class="table table-bordered table-hover align-middle text-center shadow-sm">
+      <thead class="table-light">
+        <tr><th>課程名稱</th><th>老師</th><th>時間</th><th>學分</th><th>類型</th><th>操作</th></tr>
+      </thead>
+      <tbody>
+        {% for cid in my_courses %}
+        {% set c_list = (courses|selectattr('id','equalto',cid|int)|list) %}
+        {% if c_list %}
+        {% set c = c_list[0] %}
+        <tr>
+          <td class="text-start"><i class="bi bi-book me-1"></i>{{ c.name.zh }}</td>
+          <td>{% for t in c.teacher %}<span class="badge bg-secondary bg-opacity-75 me-1"><i class="bi bi-person me-1"></i>{{ t.name }}</span>{% endfor %}</td>
+          <td><i class="bi bi-clock me-1"></i>{{ c.time|to_readable_time }}</td>
+          <td><span class="badge bg-success bg-opacity-75">{{ c.credit }}</span></td>
+          <td>
+            {% if c.courseType == '▲' or c.courseType == '△' %}
+              <span class="badge bg-primary bg-opacity-75">必修</span>
+            {% else %}
+              <span class="badge bg-secondary bg-opacity-50">選修</span>
+            {% endif %}
+          </td>
+          <td>
+            <form method="post" style="display:inline">
+              <button name="drop_id" value="{{ c.id }}" class="btn btn-outline-danger btn-sm" {% if not can_enroll %}disabled{% endif %}><i class="bi bi-x-circle"></i> 退選</button>
+            </form>
+          </td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <!-- 已選課程清單結束 -->
+  <hr class="my-4">
+  <h4 class="mb-3">熱門課程排行榜 <span class="text-muted small">（依全校選課人數排序，僅供參考）</span></h4>
+  <div class="d-flex justify-content-center">
+    <div class="card p-3 shadow-sm mb-4" style="max-width:500px;width:100%;">
+      <canvas id="hotCourseChart" height="140"></canvas>
+    </div>
+  </div>
+  <h4 class="mb-3">學分分布統計 <span class="text-muted small">（全校學生選課學分分布）</span></h4>
+  <div class="d-flex justify-content-center">
+    <div class="card p-3 shadow-sm mb-4" style="max-width:500px;width:100%;">
+      <canvas id="creditPieChart" height="140"></canvas>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+  // 熱門課程長條圖
+  let hotCourseLabels = {{ hot_course_labels|tojson }};
+  let hotCourseData = {{ hot_course_data|tojson }};
+  let hotCount = 10;
+  function setHotCount(n) {
+    hotCount = n;
+    updateHotChart();
+  }
+  function updateHotChart() {
+    hotChart.data.labels = hotCourseLabels.slice(0, hotCount);
+    hotChart.data.datasets[0].data = hotCourseData.slice(0, hotCount);
+    hotChart.update();
+  }
+  const hotChart = new Chart(document.getElementById('hotCourseChart'), {
+      type: 'bar',
+      data: {
+          labels: hotCourseLabels.slice(0, hotCount),
+          datasets: [{
+              label: '選課人數',
+              data: hotCourseData.slice(0, hotCount),
+              backgroundColor: '#2a5d9f',
+              borderRadius: 6,
+              borderSkipped: false
+          }]
+      },
+      options: {
+          plugins: { 
+            legend: { display: false },
+            tooltip: { enabled: true }
+          },
+          scales: { 
+            y: { beginAtZero: true, ticks: { stepSize: 1 } },
+            x: { ticks: { autoSkip: false, maxRotation: 60, minRotation: 30 } }
+          }
+      }
+  });
+  // 學分分布圓餅圖
+  const creditLabels = {{ credit_labels|tojson }};
+  const creditData = {{ credit_data|tojson }};
+  new Chart(document.getElementById('creditPieChart'), {
+      type: 'pie',
+      data: {
+          labels: creditLabels,
+          datasets: [{
+              data: creditData,
+              backgroundColor: ['#2a5d9f','#e67e22','#1a7f3c','#c0392b','#f4d03f','#7d3c98','#16a085','#f39c12','#2980b9','#8e44ad','#27ae60','#d35400','#c0392b']
+          }]
+      },
+      options: {
+        plugins: {
+          legend: { position: 'bottom' },
+          tooltip: { enabled: true }
+        }
+      }
+  });
+  </script>
+  <script>
+    // 顯示當前時間
+    function updateTime() {
+      const now = new Date();
+      const timeStr = (now.getMonth() + 1).toString().padStart(2, '0') + '/' + 
+                      now.getDate().toString().padStart(2, '0') + ' ' +
+                      now.getHours().toString().padStart(2, '0') + ':' + 
+                      now.getMinutes().toString().padStart(2, '0');
+      document.getElementById('current-time').textContent = timeStr;
+    }
+    updateTime();
+    setInterval(updateTime, 60000); // 每分鐘更新一次
+  </script>
+</div>
+{% endblock %} 

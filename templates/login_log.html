@@ -1,0 +1,315 @@
+{% extends 'base.html' %}
+{% block title %}登入日誌{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-3 fw-bold">日誌查詢</h2>
+  <a href="/admin" class="btn btn-outline-secondary mb-3">返回管理員首頁</a>
+  <!-- 自動刷新控制區 -->
+  <div class="mb-3 d-flex align-items-center gap-3">
+    <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" id="autoRefreshSwitch">
+      <label class="form-check-label" for="autoRefreshSwitch">自動刷新</label>
+    </div>
+    <label class="mb-0" for="refreshInterval">間隔</label>
+    <select id="refreshInterval" class="form-select w-auto">
+      <option value="10">10秒</option>
+      <option value="30" selected>30秒</option>
+      <option value="60">60秒</option>
+    </select>
+    <span class="text-muted" id="refreshStatus"></span>
+  </div>
+  <!-- 分頁籤 -->
+  <ul class="nav nav-tabs mb-3" id="logTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="login-log-tab" data-bs-toggle="tab" data-bs-target="#login-log" type="button" role="tab" aria-controls="login-log" aria-selected="true">登入日誌</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="op-log-tab" data-bs-toggle="tab" data-bs-target="#op-log" type="button" role="tab" aria-controls="op-log" aria-selected="false">操作日誌</button>
+    </li>
+  </ul>
+  <div class="tab-content" id="logTabContent">
+    <!-- 登入日誌分頁 -->
+    <div class="tab-pane fade show active" id="login-log" role="tabpanel" aria-labelledby="login-log-tab">
+      <form class="row g-2 align-items-end mb-3" id="loginLogTimeFilterForm" onsubmit="return false;">
+        <div class="col-auto">
+          <label class="form-label mb-0" for="loginStartTime">起始時間</label>
+          <input type="datetime-local" class="form-control" id="loginStartTime">
+        </div>
+        <div class="col-auto">
+          <label class="form-label mb-0" for="loginEndTime">結束時間</label>
+          <input type="datetime-local" class="form-control" id="loginEndTime">
+        </div>
+        <div class="col-auto">
+          <button type="button" class="btn btn-outline-primary" onclick="filterLoginLogByTime()">搜尋</button>
+        </div>
+        <div class="col-auto">
+          <button type="button" class="btn btn-outline-secondary" onclick="clearLoginLogTime()">清除</button>
+        </div>
+        <div class="col-auto">
+          <button type="button" class="btn btn-success" onclick="exportLoginLogCSV()">匯出 CSV</button>
+        </div>
+      </form>
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>帳號</th>
+              <th>IP</th>
+              <th>地點</th>
+              <th>時間</th>
+            </tr>
+          </thead>
+          <tbody id="loginLogTbody">
+            {% for item in log|reverse %}
+            <tr>
+              <td>{{ item.username }}</td>
+              <td>{{ item.ip }}</td>
+              <td class="ip-location" data-ip="{{ item.ip }}"></td>
+              <td>{{ item.time }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4" class="text-center">尚無登入紀錄</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- 操作日誌分頁 -->
+    <div class="tab-pane fade" id="op-log" role="tabpanel" aria-labelledby="op-log-tab">
+      <form class="row g-2 align-items-end mb-3" id="opLogTimeFilterForm" onsubmit="return false;">
+        <div class="col-auto">
+          <label class="form-label mb-0" for="opStartTime">起始時間</label>
+          <input type="datetime-local" class="form-control" id="opStartTime">
+        </div>
+        <div class="col-auto">
+          <label class="form-label mb-0" for="opEndTime">結束時間</label>
+          <input type="datetime-local" class="form-control" id="opEndTime">
+        </div>
+        <div class="col-auto">
+          <button type="button" class="btn btn-outline-primary" onclick="filterOpLogByTime()">搜尋</button>
+        </div>
+        <div class="col-auto">
+          <button type="button" class="btn btn-outline-secondary" onclick="clearOpLogTime()">清除</button>
+        </div>
+        <div class="col-auto">
+          <button type="button" class="btn btn-success" onclick="exportOpLogCSV()">匯出 CSV</button>
+        </div>
+      </form>
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>帳號</th>
+              <th>操作</th>
+              <th>目標</th>
+              <th>時間</th>
+            </tr>
+          </thead>
+          <tbody id="opLogTbody">
+            {% for item in op_log|reverse %}
+            <tr>
+              <td>{{ item.username }}</td>
+              <td>{{ item.action }}</td>
+              <td>{{ item.target }}</td>
+              <td>{{ item.time }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4" class="text-center">尚無操作紀錄</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// --- 共用時間解析 ---
+function parseLogDate(str) {
+  const m = str.match(/(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?/);
+  if (!m) return null;
+  return new Date(
+    Number(m[1]), Number(m[2]) - 1, Number(m[3]),
+    Number(m[4]), Number(m[5]), Number(m[6] || 0)
+  );
+}
+// --- 登入日誌搜尋/清除 ---
+function filterLoginLogByTime() {
+  const start = document.getElementById('loginStartTime').value;
+  const end = document.getElementById('loginEndTime').value;
+  const ths = document.querySelectorAll('#login-log thead th');
+  let timeIdx = -1;
+  ths.forEach((th, idx) => {
+    if (th.textContent.trim().includes('時間')) timeIdx = idx;
+  });
+  if (timeIdx === -1) return;
+  document.querySelectorAll('#loginLogTbody tr').forEach(row => {
+    if (row.children.length <= timeIdx) return;
+    const timeStr = row.children[timeIdx].textContent.trim();
+    const logDate = parseLogDate(timeStr);
+    let show = true;
+    if (start) {
+      const startDate = new Date(start);
+      if (!logDate || logDate < startDate) show = false;
+    }
+    if (end) {
+      const endDate = new Date(end);
+      if (!logDate || logDate > endDate) show = false;
+    }
+    row.style.display = show ? '' : 'none';
+  });
+}
+function clearLoginLogTime() {
+  document.getElementById('loginStartTime').value = '';
+  document.getElementById('loginEndTime').value = '';
+  filterLoginLogByTime();
+}
+// --- 操作日誌搜尋/清除 ---
+function filterOpLogByTime() {
+  const start = document.getElementById('opStartTime').value;
+  const end = document.getElementById('opEndTime').value;
+  const ths = document.querySelectorAll('#op-log thead th');
+  let timeIdx = -1;
+  ths.forEach((th, idx) => {
+    if (th.textContent.trim().includes('時間')) timeIdx = idx;
+  });
+  if (timeIdx === -1) return;
+  document.querySelectorAll('#opLogTbody tr').forEach(row => {
+    if (row.children.length <= timeIdx) return;
+    const timeStr = row.children[timeIdx].textContent.trim();
+    const logDate = parseLogDate(timeStr);
+    let show = true;
+    if (start) {
+      const startDate = new Date(start);
+      if (!logDate || logDate < startDate) show = false;
+    }
+    if (end) {
+      const endDate = new Date(end);
+      if (!logDate || logDate > endDate) show = false;
+    }
+    row.style.display = show ? '' : 'none';
+  });
+}
+function clearOpLogTime() {
+  document.getElementById('opStartTime').value = '';
+  document.getElementById('opEndTime').value = '';
+  filterOpLogByTime();
+}
+// --- 匯出登入日誌 CSV ---
+function exportLoginLogCSV() {
+  exportTableToCSV(document.querySelector('#loginLogTbody').parentElement, 'login_log.csv');
+}
+// --- 匯出操作日誌 CSV ---
+function exportOpLogCSV() {
+  exportTableToCSV(document.querySelector('#opLogTbody').parentElement, 'operation_log.csv');
+}
+// --- 匯出工具 ---
+function exportTableToCSV(table, filename) {
+  let csv = [];
+  const rows = table.querySelectorAll('tr');
+  rows.forEach(row => {
+    if (row.style.display === 'none') return; // 只匯出顯示中的資料
+    let cols = Array.from(row.querySelectorAll('th,td')).map(td => '"' + td.textContent.replace(/"/g, '""') + '"');
+    csv.push(cols.join(','));
+  });
+  const csvStr = csv.join('\n');
+  const blob = new Blob([csvStr], { type: 'text/csv' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+// --- IP 反查地點（登入日誌）---
+function fetchIpLocation(ip, td) {
+  // 使用 ip-api.com 免費 API
+  fetch(`https://ip-api.com/json/${ip}?lang=zh-TW`).then(r => r.json()).then(data => {
+    if (data.status === 'success') {
+      td.textContent = (data.country || '') + (data.regionName ? ' ' + data.regionName : '') + (data.city ? ' ' + data.city : '');
+    } else {
+      td.textContent = '查無';
+    }
+  }).catch(() => { td.textContent = '查詢失敗'; });
+}
+document.addEventListener('DOMContentLoaded', function() {
+  // 自動查詢登入日誌 IP 地點
+  document.querySelectorAll('#loginLogTbody tr').forEach(row => {
+    const ipTd = row.querySelector('td[data-ip]');
+    const locTd = row.querySelector('.ip-location');
+    if (ipTd && locTd) {
+      fetchIpLocation(ipTd.dataset.ip, locTd);
+    }
+  });
+});
+// --- 自動刷新/即時監控 ---
+let autoRefreshTimer = null;
+let lastActiveTab = 'login-log';
+function startAutoRefresh() {
+  stopAutoRefresh();
+  const interval = Number(document.getElementById('refreshInterval').value) * 1000;
+  autoRefreshTimer = setInterval(() => {
+    if (lastActiveTab === 'login-log') {
+      fetchLogAjax('login');
+    } else {
+      fetchLogAjax('op');
+    }
+  }, interval);
+  document.getElementById('refreshStatus').textContent = `每${interval/1000}秒自動刷新`;
+}
+function stopAutoRefresh() {
+  if (autoRefreshTimer) clearInterval(autoRefreshTimer);
+  document.getElementById('refreshStatus').textContent = '';
+}
+document.getElementById('autoRefreshSwitch').addEventListener('change', function() {
+  if (this.checked) {
+    startAutoRefresh();
+  } else {
+    stopAutoRefresh();
+  }
+});
+document.getElementById('refreshInterval').addEventListener('change', function() {
+  if (document.getElementById('autoRefreshSwitch').checked) {
+    startAutoRefresh();
+  }
+});
+document.querySelectorAll('button[data-bs-toggle="tab"]').forEach(btn => {
+  btn.addEventListener('shown.bs.tab', function(e) {
+    lastActiveTab = e.target.getAttribute('data-bs-target').replace('#','');
+  });
+});
+// --- AJAX 載入日誌 ---
+function fetchLogAjax(type) {
+  let url = type === 'login' ? '/admin/login_log?ajax=1' : '/admin/operation_log?ajax=1';
+  fetch(url).then(r => r.json()).then(data => {
+    if (type === 'login') {
+      updateLoginLogTable(data);
+      filterLoginLogByTime();
+      // 重新查詢 IP 地點
+      document.querySelectorAll('#loginLogTbody tr').forEach(row => {
+        const ipTd = row.querySelector('td[data-ip]');
+        const locTd = row.querySelector('.ip-location');
+        if (ipTd && locTd) {
+          fetchIpLocation(ipTd.dataset.ip, locTd);
+        }
+      });
+    } else {
+      updateOpLogTable(data);
+      filterOpLogByTime();
+    }
+  });
+}
+function updateLoginLogTable(logs) {
+  const tbody = document.getElementById('loginLogTbody');
+  tbody.innerHTML = logs.length ? logs.map(item =>
+    `<tr><td>${item.username}</td><td data-ip="${item.ip}">${item.ip}</td><td class="ip-location" data-ip="${item.ip}"></td><td>${item.time}</td></tr>`
+  ).join('') : '<tr><td colspan="4" class="text-center">尚無登入紀錄</td></tr>';
+}
+function updateOpLogTable(logs) {
+  const tbody = document.getElementById('opLogTbody');
+  tbody.innerHTML = logs.length ? logs.map(item =>
+    `<tr><td>${item.username}</td><td>${item.action}</td><td>${item.target}</td><td>${item.time}</td></tr>`
+  ).join('') : '<tr><td colspan="4" class="text-center">尚無操作紀錄</td></tr>';
+}
+</script>
+{% endblock %} 

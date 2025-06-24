@@ -1,0 +1,399 @@
+{
+  "1234": {
+    "password": "$2b$12$.QIj16n/BgqQgg3Fy4kYGuzuPWy2sYOcTPK/kgyu54t1dI8n9pDkS",
+    "role": "admin",
+    "name": "管理員"
+  },
+  "113650001": {
+    "password": "$2b$12$HlASd/3muEHNqfNTtLJ.j.UdHgTyF8FEK0BO4NYzL9.8gxKlQl4Cu",
+    "role": "student",
+    "name": "113650001",
+    "student_id": "113650001",
+    "class": "光電2"
+  },
+  "113650002": {
+    "password": "$2b$12$3bJHK3w2d/5QUKvVGk0IDePmLmcLz2fD/cshFiJmorfDGGw9hwxHG",
+    "role": "student",
+    "name": "113650002",
+    "student_id": "113650002",
+    "class": "光電2"
+  },
+  "113650003": {
+    "password": "$2b$12$6P2SsnbYG1VD0wScK7l9TuyMV2Fd59rUULMdvsfXuSacsnDhxTCVS",
+    "role": "student",
+    "name": "113650003",
+    "student_id": "113650003",
+    "class": "光電2"
+  },
+  "113650004": {
+    "password": "$2b$12$qZvHBjbN6qUDe664WATaFOBX.ftysNExvZMkiOveSltKOkmrccgru",
+    "role": "student",
+    "name": "113650004",
+    "student_id": "113650004",
+    "class": "光電2"
+  },
+  "113650005": {
+    "password": "$2b$12$8y2soAW5evPkwtCVedKtAuhNqaNfSJaX1aVHEjlzpKEFLbZHllpl.",
+    "role": "student",
+    "name": "113650005",
+    "student_id": "113650005",
+    "class": "光電2"
+  },
+  "113650006": {
+    "password": "$2b$12$eF5BMZGdbIF8GW/T89F4MuN8/GPZzZ71jrWFVAkee9sKCooaHQYe6",
+    "role": "student",
+    "name": "113650006",
+    "student_id": "113650006",
+    "class": "光電2"
+  },
+  "113650007": {
+    "password": "$2b$12$hBdi.otT9/NnI3CmIWW9j.rljmg1ptdfmXKfCQQi/MKzBiwXwfIc.",
+    "role": "student",
+    "name": "113650007",
+    "student_id": "113650007",
+    "class": "光電2"
+  },
+  "113650008": {
+    "password": "$2b$12$8Js2cKkPA/JDnMekgRtBnu.Plf3hfOF5vjgcG1HUIsvmZOBtOcXn6",
+    "role": "student",
+    "name": "113650008",
+    "student_id": "113650008",
+    "class": "光電2"
+  },
+  "113650009": {
+    "password": "$2b$12$77hUt3nkG4nVCIiuKSmRsuMLaLNiWyS3d.uN6zTNyS2d/UKOvxtl2",
+    "role": "student",
+    "name": "113650009",
+    "student_id": "113650009",
+    "class": "光電2"
+  },
+  "113650010": {
+    "password": "$2b$12$FbcwB0Yu1IWIxluvWDG8x.8BoWtRaOQzWNSaNfQYL2mfQ2w7LA1aK",
+    "role": "student",
+    "name": "113650010",
+    "student_id": "113650010",
+    "class": "光電2"
+  },
+  "113650011": {
+    "password": "$2b$12$PeGTUo2wsz1siKUzfJP16O6n3bXVTtKsk5SAPVvphzlUWpOef/E/W",
+    "role": "student",
+    "name": "113650011",
+    "student_id": "113650011",
+    "class": "光電2"
+  },
+  "113650012": {
+    "password": "$2b$12$unsXCPa0kzGqyNkjySUJdeGuRl1XA31n6Q7bDEHrS0kdUqg8njCee",
+    "role": "student",
+    "name": "113650012",
+    "student_id": "113650012",
+    "class": "光電2"
+  },
+  "113650013": {
+    "password": "$2b$12$Jd54gdQupkvYSlJfROE7KudiEHcZH1/vQpOuU/3g.Plp3kBSYR7Yq",
+    "role": "student",
+    "name": "113650013",
+    "student_id": "113650013",
+    "class": "光電2"
+  },
+  "113650014": {
+    "password": "$2b$12$KnQkUah7ZCftO.CCCz0FwO.z0bDkw86hEh9X0FKPJ71lz9d/8FGFK",
+    "role": "student",
+    "name": "113650014",
+    "student_id": "113650014",
+    "class": "光電2"
+  },
+  "113650015": {
+    "password": "$2b$12$vu4qfIgkdDr5oaV.iXOKbexhNn6BBQA0kGDDZjwWYHYFNIxkSJUz6",
+    "role": "student",
+    "name": "113650015",
+    "student_id": "113650015",
+    "class": "光電2"
+  },
+  "113650016": {
+    "password": "$2b$12$PkppC1BS1NzC2oHruV5R1uYWymLOBTIB8X7aKd3kJCMoPoff9LPn6",
+    "role": "student",
+    "name": "113650016",
+    "student_id": "113650016",
+    "class": "光電2"
+  },
+  "113650017": {
+    "password": "$2b$12$G9G/SFS7Q4TXIQFgz4Alle5vREJfJExkDnl65C0z1F/5tTWgHLPam",
+    "role": "student",
+    "name": "113650017",
+    "student_id": "113650017",
+    "class": "光電2"
+  },
+  "113650018": {
+    "password": "$2b$12$lXxt8VrFASkAeleJ4UBtFe0/WGKUa8sX3vkX8Jqy6RHhcnCLHksp2",
+    "role": "student",
+    "name": "113650018",
+    "student_id": "113650018",
+    "class": "光電2"
+  },
+  "113650019": {
+    "password": "$2b$12$1.uXWg6gmj9UPdAU4O5Xwu84blxsQpOxoxJe15nYUz0x171Ywx9cm",
+    "role": "student",
+    "name": "113650019",
+    "student_id": "113650019",
+    "class": "光電2"
+  },
+  "113650020": {
+    "password": "$2b$12$xNN3WRQuhDWMrQFt9ziPIeAmnIhNVY/ri6WdeYy5U64rMLPK4UA62",
+    "role": "student",
+    "name": "113650020",
+    "student_id": "113650020",
+    "class": "光電2"
+  },
+  "113650021": {
+    "password": "$2b$12$tFk8FjV8dlEkqQxTRJXG5e2RsIrer.fxsdPBG945MSUJTQAybJN0S",
+    "role": "student",
+    "name": "113650021",
+    "student_id": "113650021",
+    "class": "光電2"
+  },
+  "113650022": {
+    "password": "$2b$12$4/zSfFd/BY.pnAJkLwkCrO0LfkTMAcTW9hEF1d7SCNqGTcp/va8Hm",
+    "role": "student",
+    "name": "113650022",
+    "student_id": "113650022",
+    "class": "光電2"
+  },
+  "113650023": {
+    "password": "$2b$12$cwxynQrEbYxUIxburM/zM.7Dgzvb/kYLbLMrSsUM3S1Ekmf.R1gu.",
+    "role": "student",
+    "name": "113650023",
+    "student_id": "113650023",
+    "class": "光電2"
+  },
+  "113650024": {
+    "password": "$2b$12$ueQMiHbYIMGswR6KwSuoCugtWHEQTTCIGKkkPt5W0DN8aBXxNvpM2",
+    "role": "student",
+    "name": "113650024",
+    "student_id": "113650024",
+    "class": "光電2"
+  },
+  "113650025": {
+    "password": "$2b$12$iQU9vLN6xMFSvOVRZ5dN4ukqTfTPQQLNbo4ExtMqGPfd7uQa/doMG",
+    "role": "student",
+    "name": "113650025",
+    "student_id": "113650025",
+    "class": "光電2"
+  },
+  "113650026": {
+    "password": "$2b$12$vt.Z57CkMpPqcry1WpiQX.Zfr1VU.FMKWUDe5yuOnGTOejbaob4dW",
+    "role": "student",
+    "name": "113650026",
+    "student_id": "113650026",
+    "class": "光電2"
+  },
+  "113650027": {
+    "password": "$2b$12$osZBKKsLj31gawr1Uc3eOOYYTyavjyDOY9tQ5RUKm1RQOMGz87i.C",
+    "role": "student",
+    "name": "113650027",
+    "student_id": "113650027",
+    "class": "光電2"
+  },
+  "113650028": {
+    "password": "$2b$12$mdQd8h9ldERw6qOPxCCXb.U.uC71GHcamJuXkENpjJ48jr0IApUli",
+    "role": "student",
+    "name": "113650028",
+    "student_id": "113650028",
+    "class": "光電2"
+  },
+  "113650029": {
+    "password": "$2b$12$lR35UNimsOi4.hl/cto9LeGCWHbXBvcgxWo8xBIPv/arzxhnaCOdC",
+    "role": "student",
+    "name": "113650029",
+    "student_id": "113650029",
+    "class": "光電2"
+  },
+  "113650030": {
+    "password": "$2b$12$squitneOIbMnpd8Pr5Je3u.UX5kKUEdRY8iwQwPQxrfg5Vpht.Dva",
+    "role": "student",
+    "name": "113650030",
+    "student_id": "113650030",
+    "class": "光電2"
+  },
+  "113650031": {
+    "password": "$2b$12$hY3OftMkt1yvqLYPTvO7R.gATYGfYfN906EibIlZCsPpSzS2SPZJO",
+    "role": "student",
+    "name": "113650031",
+    "student_id": "113650031",
+    "class": "光電2"
+  },
+  "113650032": {
+    "password": "$2b$12$4MmgvMLAIZX4MwbmbPZWX.cz1qTXTgB8sIukfnSAvdZtvpUoFrAua",
+    "role": "student",
+    "name": "113650032",
+    "student_id": "113650032",
+    "class": "光電2"
+  },
+  "113650033": {
+    "password": "$2b$12$QFEJIdb7AWuiUZkUUI0XXudR8a5Ge6h.IrutdswobMoEoScZ2R/f2",
+    "role": "student",
+    "name": "113650033",
+    "student_id": "113650033",
+    "class": "光電2"
+  },
+  "113650034": {
+    "password": "$2b$12$P1lbSMYiwtSpnj.aHDYpGes1l31grL.tPhyOwFyarS..XdAPXf71C",
+    "role": "student",
+    "name": "113650034",
+    "student_id": "113650034",
+    "class": "光電2"
+  },
+  "113650035": {
+    "password": "$2b$12$xu7kLFJgcey9ALdcYBPGE.T2unUVRQs/zrPSZ9wxNhIHVRbutazba",
+    "role": "student",
+    "name": "113650035",
+    "student_id": "113650035",
+    "class": "光電2"
+  },
+  "113650036": {
+    "password": "$2b$12$k1BF9WoU0rayTCLgddqte.ZSIUhzs6sela73g05ezfyc/9EIJQol.",
+    "role": "student",
+    "name": "113650036",
+    "student_id": "113650036",
+    "class": "光電2"
+  },
+  "113650037": {
+    "password": "$2b$12$n9dp8LFC6YzsvJcMn63rI.35V6uZi2tcGOvmCsJ8o9E6HgEHMD0vG",
+    "role": "student",
+    "name": "113650037",
+    "student_id": "113650037",
+    "class": "光電2"
+  },
+  "113650038": {
+    "password": "$2b$12$4WVfHkAX5yFLChxM3R6KXeFsDUXSC6SUmhOUri1JRb8svebuLymu2",
+    "role": "student",
+    "name": "113650038",
+    "student_id": "113650038",
+    "class": "光電2"
+  },
+  "113650039": {
+    "password": "$2b$12$R3APGiAt1Muaq0GzV41HCe8R49EPlnAwa0hNTUINbLcNc09nepcOq",
+    "role": "student",
+    "name": "113650039",
+    "student_id": "113650039",
+    "class": "光電2"
+  },
+  "113650040": {
+    "password": "$2b$12$KmNtRE5qcKfRIIfqw.d2IuJJbZkthgV9YtJQv1s7Stu0RWQQEh8OW",
+    "role": "student",
+    "name": "113650040",
+    "student_id": "113650040",
+    "class": "光電2"
+  },
+  "113650041": {
+    "password": "$2b$12$DnX88iJ0MwxWApWSvm2dZeLPkdhMP5S5dIbI/EeK7xTXzHV3K1kby",
+    "role": "student",
+    "name": "113650041",
+    "student_id": "113650041",
+    "class": "光電2"
+  },
+  "113650042": {
+    "password": "$2b$12$4GCRDRS8RixTdu/KvcRxq.OOSgZG4YL61C3xdKg63//Ou2aZUoNYO",
+    "role": "student",
+    "name": "113650042",
+    "student_id": "113650042",
+    "class": "光電2"
+  },
+  "113650043": {
+    "password": "$2b$12$WON5r3yXXMemZbXuKIn2KO9dpwjGMxRe8.gzMqZb3EmuMxIVM7ZQW",
+    "role": "student",
+    "name": "113650043",
+    "student_id": "113650043",
+    "class": "光電2"
+  },
+  "113650044": {
+    "password": "$2b$12$.PgPTwa/bit6kV/581mHmuK/2ySIA3SI9tk/SOz2ZEuzw1jBZsPme",
+    "role": "student",
+    "name": "113650044",
+    "student_id": "113650044",
+    "class": "光電2"
+  },
+  "113650045": {
+    "password": "$2b$12$CilyCwCpioIqq01YhTmDIOlK/EqkcTGAqqfj2Nh1STvgNPcZUbHZK",
+    "role": "student",
+    "name": "113650045",
+    "student_id": "113650045",
+    "class": "光電2"
+  },
+  "113650046": {
+    "password": "$2b$12$tvBjDfGyNd3VoXy.l3Q84OleVGPxzKo/CZifraD8HOXVdz48KEoTy",
+    "role": "student",
+    "name": "113650046",
+    "student_id": "113650046",
+    "class": "光電2"
+  },
+  "113650047": {
+    "password": "$2b$12$7J4GuAXbTKoGvly60khdDOetVLbY/Qb/n8vWUQFFnoc4k5s1hP7GO",
+    "role": "student",
+    "name": "113650047",
+    "student_id": "113650047",
+    "class": "光電2"
+  },
+  "113650048": {
+    "password": "$2b$12$xeixGoSTsNl0EZUrazuIJ.IifL0EOTDu6oLwjzcLxob1XGEPvzQEa",
+    "role": "student",
+    "name": "113650048",
+    "student_id": "113650048",
+    "class": "光電2"
+  },
+  "113650049": {
+    "password": "$2b$12$SOueWvCHuDRAMg.KvB9Hu.uKUjXacj/2c5lDKWvyVP3m.L6kfeyZG",
+    "role": "student",
+    "name": "113650049",
+    "student_id": "113650049",
+    "class": "光電2"
+  },
+  "113650050": {
+    "password": "$2b$12$XUxMrSzFM9L/ZNmwz8gX7Ojq7i3zZVLwQhpqx7pK920EaucXfwzBW",
+    "role": "student",
+    "name": "113650050",
+    "student_id": "113650050",
+    "class": "光電2"
+  },
+  "113650051": {
+    "password": "$2b$12$9QX6gwMI31PybBGCW594M.QETZgBsLhMUvuMBjgZQ6zgh6lyBSuku",
+    "role": "student",
+    "name": "113650051",
+    "student_id": "113650051",
+    "class": "光電2"
+  },
+  "113650052": {
+    "password": "$2b$12$VrLksWGht27vMGauJjgHa.BW.lXVHQSHzZhLNkbORPU5c/TyTT9v2",
+    "role": "student",
+    "name": "113650052",
+    "student_id": "113650052",
+    "class": "光電2"
+  },
+  "113650053": {
+    "password": "$2b$12$EUzwGnO.9qqFxkPIBgROKO2p4HRLAnZrgYuVolgMiB/QGRCXv78Vy",
+    "role": "student",
+    "name": "113650053",
+    "student_id": "113650053",
+    "class": "光電2"
+  },
+  "113650054": {
+    "password": "$2b$12$5c60bloWQK3FP5EFTIoAhOlfN7MrPZq5xKKuXIWCGpfMiqRtlfOU.",
+    "role": "student",
+    "name": "113650054",
+    "student_id": "113650054",
+    "class": "光電2"
+  },
+  "113650055": {
+    "password": "$2b$12$0h5/7/B1JTJjmP6b5Zqv0.KfOrUkKs3HykRFaKyFtc2EgDEbDtb6i",
+    "role": "student",
+    "name": "113650055",
+    "student_id": "113650055",
+    "class": "光電2"
+  },
+  "113650056": {
+    "password": "$2b$12$u913UcFm1d663HjkBEeeVe7U8zjBa3P7TfTQQfkFBbAUszhKIjlGS",
+    "role": "student",
+    "name": "113650056",
+    "student_id": "113650056",
+    "class": "光電2"
+  }
+}

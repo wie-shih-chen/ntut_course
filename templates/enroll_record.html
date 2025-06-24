@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+{% block title %}學生選課紀錄查詢{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="fw-bold mb-4"><i class="bi bi-clipboard-data me-2"></i>學生選課紀錄查詢</h2>
+  <a href="/admin" class="btn btn-outline-secondary mb-3"><i class="bi bi-arrow-left"></i> 返回管理員首頁</a>
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <form method="get" class="row g-2 align-items-center">
+        <div class="col-auto">
+          <label for="year" class="form-label mb-0">學年：</label>
+          <select name="year" id="year" class="form-select">
+            {% for y in years %}
+            <option value="{{ y }}" {% if y==year %}selected{% endif %}>{{ y }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-auto">
+          <label for="sem" class="form-label mb-0">學期：</label>
+          <select name="sem" id="sem" class="form-select">
+            {% for s in sems %}
+            <option value="{{ s }}" {% if s==sem %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-auto">
+          <label for="student_id" class="form-label mb-0">學號：</label>
+          <input type="text" name="student_id" id="student_id" class="form-control" value="{{ student_id }}">
+        </div>
+        <div class="col-auto">
+          <button type="submit" class="btn btn-primary"><i class="bi bi-search me-1"></i>查詢</button>
+        </div>
+        <div class="col-auto">
+          <a href="?year={{ year }}&sem={{ sem }}&student_id={{ student_id }}&export=1" class="btn btn-outline-success"><i class="bi bi-file-earmark-arrow-down me-1"></i>匯出CSV</a>
+        </div>
+      </form>
+    </div>
+  </div>
+  <h4 class="mb-3">學生選課清單</h4>
+  <div class="table-responsive">
+    <table class="table table-bordered table-hover align-middle text-center">
+      <thead class="table-light">
+        <tr><th>學號</th><th>姓名</th><th>班級</th><th>已選課程</th></tr>
+      </thead>
+      <tbody>
+        {% for stu in students %}
+        <tr>
+          <td>{{ stu.student_id }}</td>
+          <td>{{ stu.name }}</td>
+          <td>{{ stu.class }}</td>
+          <td>
+            <ul class="list-unstyled mb-0">
+              {% for cid in stu.courses %}
+                <li>{{ course_map[cid].name.zh if cid in course_map else cid }}</li>
+              {% endfor %}
+            </ul>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <h4 class="mb-3">課程選課人數統計 <span class="text-muted small">（熱門排行榜，依選課人數排序）</span></h4>
+  <div class="table-responsive mb-2">
+    <table class="table table-bordered table-hover align-middle text-center">
+      <thead class="table-light">
+        <tr><th>課程名稱</th><th>課程ID</th><th>選課人數</th></tr>
+      </thead>
+      <tbody>
+        {% for cid, count in course_count.items()|sort(attribute='1', reverse=True) %}
+        <tr>
+          <td>{{ course_map[cid].name.zh if cid in course_map else cid }}</td>
+          <td>{{ cid }}</td>
+          <td>{{ count }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <a href="?year={{ year }}&sem={{ sem }}&student_id={{ student_id }}&export=hot" class="btn btn-outline-success btn-sm mb-4"><i class="bi bi-file-earmark-arrow-down me-1"></i>匯出熱門課程排行榜</a>
+  <h4 class="mb-3">選課統計視覺化 <span class="text-muted small">（可點選下方按鈕切換排行榜數量）</span></h4>
+  <div class="mb-3">
+    <button class="btn btn-outline-primary btn-sm me-1" onclick="setHotCount(10)">前10名</button>
+    <button class="btn btn-outline-primary btn-sm me-1" onclick="setHotCount(20)">前20名</button>
+    <button class="btn btn-outline-primary btn-sm" onclick="setHotCount(50)">前50名</button>
+  </div>
+  <div class="row mb-4">
+    <div class="col-md-7 mb-3 mb-md-0">
+      <div class="card p-3 shadow-sm">
+        <div class="fw-bold mb-2">熱門課程長條圖 <span class="text-muted small">（顯示選課人數最多的課程）</span></div>
+        <canvas id="hotCourseChart" height="220"></canvas>
+      </div>
+    </div>
+    <div class="col-md-5">
+      <div class="card p-3 shadow-sm">
+        <div class="fw-bold mb-2">學分分布圓餅圖 <span class="text-muted small">（顯示不同學分區間的學生人數）</span></div>
+        <canvas id="creditPieChart" height="220"></canvas>
+        <a href="?year={{ year }}&sem={{ sem }}&student_id={{ student_id }}&export=credit" class="btn btn-outline-success btn-sm mt-3"><i class="bi bi-file-earmark-arrow-down me-1"></i>匯出學分分布統計</a>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// 熱門課程長條圖
+let hotCourseLabels = {{ hot_course_labels|tojson }};
+let hotCourseData = {{ hot_course_data|tojson }};
+let hotCount = 10;
+function setHotCount(n) {
+  hotCount = n;
+  updateHotChart();
+}
+function updateHotChart() {
+  hotChart.data.labels = hotCourseLabels.slice(0, hotCount);
+  hotChart.data.datasets[0].data = hotCourseData.slice(0, hotCount);
+  hotChart.update();
+}
+const hotChart = new Chart(document.getElementById('hotCourseChart'), {
+    type: 'bar',
+    data: {
+        labels: hotCourseLabels.slice(0, hotCount),
+        datasets: [{
+            label: '選課人數',
+            data: hotCourseData.slice(0, hotCount),
+            backgroundColor: '#2a5d9f',
+            borderRadius: 6,
+            borderSkipped: false
+        }]
+    },
+    options: {
+        plugins: { 
+          legend: { display: false },
+          tooltip: { enabled: true }
+        },
+        scales: { 
+          y: { beginAtZero: true, ticks: { stepSize: 1 } },
+          x: { ticks: { autoSkip: false, maxRotation: 60, minRotation: 30 } }
+        }
+    }
+});
+// 學分分布圓餅圖
+const creditLabels = {{ credit_labels|tojson }};
+const creditData = {{ credit_data| tojson }};
+new Chart(document.getElementById('creditPieChart'), {
+    type: 'pie',
+    data: {
+        labels: creditLabels,
+        datasets: [{
+            data: creditData,
+            backgroundColor: ['#2a5d9f','#e67e22','#1a7f3c','#c0392b','#f4d03f','#7d3c98','#16a085','#f39c12','#2980b9','#8e44ad','#27ae60','#d35400','#c0392b']
+        }]
+    },
+    options: {
+      plugins: {
+        legend: { position: 'bottom' },
+        tooltip: { enabled: true }
+      }
+    }
+});
+</script>
+{% endblock %} 
