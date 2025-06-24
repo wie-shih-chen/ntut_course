@@ -185,7 +185,6 @@ def index():
             
             # 取得學生已選課
             record = load_enroll_record()
-            key = f"{year}-{sem}"
             enrolls = record.get(key, {})
             my_courses = enrolls.get(session['user'], [])
             MAX_CREDIT = 25
