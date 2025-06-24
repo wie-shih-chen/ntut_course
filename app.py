@@ -811,6 +811,22 @@ def student_enroll():
     # 取得本班所有必修課
     required_courses = [c for c in courses if c.get('courseType', '') in ['▲', '△'] and any(cls['name'] == class_name_ch for cls in c.get('class', []))]
     required_ids = [str(c['id']) for c in required_courses]
+    # 衝堂檢查（已選課+必修課）
+    def is_conflict(new_course):
+        new_time = new_course.get('time', {})
+        # 檢查已選課+必修課
+        for cid in set(my_courses + required_ids):
+            if str(cid) == str(new_course.get('id')):
+                continue
+            c = next((x for x in courses if str(x.get('id')) == str(cid)), None)
+            if not c:
+                continue
+            for day, sections in new_time.items():
+                if not sections:
+                    continue
+                if day in c['time'] and set(sections) & set(c['time'][day]):
+                    return True
+        return False
     # 分類課程，並過濾掉會衝堂的課
     tab_courses = {k: [] for k in ['通識','體育','語言','選修']}
     for c in courses:
@@ -872,22 +888,6 @@ def student_enroll():
         msg = '尚未設定選課時段'
     # 學分上限
     MAX_CREDIT = 25
-    # 衝堂檢查（已選課+必修課）
-    def is_conflict(new_course):
-        new_time = new_course.get('time', {})
-        # 檢查已選課+必修課
-        for cid in set(my_courses + required_ids):
-            if str(cid) == str(new_course.get('id')):
-                continue
-            c = next((x for x in courses if str(x.get('id')) == str(cid)), None)
-            if not c:
-                continue
-            for day, sections in new_time.items():
-                if not sections:
-                    continue
-                if day in c['time'] and set(sections) & set(c['time'][day]):
-                    return True
-        return False
     # 選課處理
     if request.method == 'POST' and can_enroll:
         add_id = request.form.get('add_id')
