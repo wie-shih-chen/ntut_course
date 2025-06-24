@@ -184,6 +184,7 @@ def index():
                 can_enroll = start_num <= now_num <= end_num
             
             # 取得學生已選課
+            key = f"{year}-{sem}"
             record = load_enroll_record()
             enrolls = record.get(key, {})
             my_courses = enrolls.get(session['user'], [])
