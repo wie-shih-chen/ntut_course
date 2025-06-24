@@ -803,6 +803,14 @@ def student_enroll():
     tab = request.args.get('tab', '必修')
     data_dir = os.path.join(os.path.dirname(__file__), 'data')
     courses = load_courses(data_dir, year, sem)
+    key = f"{year}-{sem}"
+    # 取得學生已選課
+    record = load_enroll_record()
+    enrolls = record.get(key, {})
+    my_courses = enrolls.get(session['user'], [])
+    # 取得本班所有必修課
+    required_courses = [c for c in courses if c.get('courseType', '') in ['▲', '△'] and any(cls['name'] == class_name_ch for cls in c.get('class', []))]
+    required_ids = [str(c['id']) for c in required_courses]
     # 分類課程，並過濾掉會衝堂的課
     tab_courses = {k: [] for k in ['通識','體育','語言','選修']}
     for c in courses:
@@ -862,17 +870,8 @@ def student_enroll():
         can_enroll = start_num <= now_num <= end_num
     else:
         msg = '尚未設定選課時段'
-    # 取得學生已選課
-    record = load_enroll_record()
-    enrolls = record.get(key, {})
-    my_courses = enrolls.get(session['user'], [])
     # 學分上限
     MAX_CREDIT = 25
-    # 取得本班所有必修課
-    required_courses = [c for c in courses if c.get('courseType', '') in ['▲', '△'] and any(cls['name'] == class_name_ch for cls in c.get('class', []))]
-    required_ids = [str(c['id']) for c in required_courses]
-    all_course_ids = set(my_courses) | set(required_ids)
-    my_credit = sum(float(c.get('credit', 0)) for c in courses if str(c.get('id')) in all_course_ids)
     # 衝堂檢查（已選課+必修課）
     def is_conflict(new_course):
         new_time = new_course.get('time', {})
