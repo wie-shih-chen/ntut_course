@@ -4,50 +4,6 @@
 <div class="container py-4">
   <h2 class="fw-bold mb-3"><i class="bi bi-journal-text me-2"></i>學生選課系統</h2>
   <a href="{{ url_for('index') }}" class="btn btn-outline-secondary mb-3"><i class="bi bi-arrow-left"></i> 返回首頁</a>
-  <!-- 新增選課時段分頁籤 -->
-  <ul class="nav nav-tabs mb-3" id="periodTab" role="tablist">
-    <li class="nav-item">
-      <button class="nav-link active" id="ongoing-tab" data-bs-toggle="tab" data-bs-target="#ongoing" type="button">進行中時段</button>
-    </li>
-    <li class="nav-item">
-      <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button">歷史時段</button>
-    </li>
-  </ul>
-  <div class="tab-content mb-4">
-    <div class="tab-pane fade show active" id="ongoing" role="tabpanel">
-      <div id="ongoing-list"></div>
-    </div>
-    <div class="tab-pane fade" id="history" role="tabpanel">
-      <div id="history-list"></div>
-    </div>
-  </div>
-  <script>
-  fetch('/api/enroll_periods')
-    .then(r => r.json())
-    .then(data => {
-      renderPeriods('ongoing', data.ongoing);
-      renderPeriods('history', data.history);
-    });
-  function renderPeriods(type, periods) {
-    const container = document.getElementById(type + '-list');
-    if (!container) return;
-    if (!periods.length) {
-      container.innerHTML = '<div class="text-muted">無資料</div>';
-      return;
-    }
-    container.innerHTML = periods.map(p =>
-      `<div class="card mb-2 p-2 d-flex flex-row align-items-center justify-content-between">
-        <div>
-          <span class="fw-bold">${p.year}-${p.sem} ${p.name}</span>
-          <span class="text-muted small ms-2">${p.start} ~ ${p.end}</span>
-        </div>
-        <div>
-          ${type === 'ongoing' ? `<a href="?year=${p.year}&sem=${p.sem}" class="btn btn-primary btn-sm">選課</a>` : `<a href="/admin/enroll_record?year=${p.year}&sem=${p.sem}" class="btn btn-outline-info btn-sm">查詢紀錄</a>`}
-        </div>
-      </div>`
-    ).join('');
-  }
-  </script>
   <form method="get" class="row g-2 align-items-center mb-3">
     <div class="col-auto">
       <label for="year" class="form-label mb-0">學年：</label>

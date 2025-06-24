@@ -11,7 +11,7 @@
    ```
 2. 啟動伺服器：
    ```bash
-   python app.py
+   
    ```
 3. 啟動後，瀏覽器開啟 [http://localhost:5000](http://localhost:5000)
 4. 使用預設帳號登入：
