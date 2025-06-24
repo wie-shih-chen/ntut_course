@@ -1,3 +1,6 @@
 flask
 flask-swagger-ui
 bcrypt 
+
+# for Render deployment
+gunicorn 
