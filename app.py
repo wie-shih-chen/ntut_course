@@ -803,12 +803,17 @@ def student_enroll():
     tab = request.args.get('tab', '必修')
     data_dir = os.path.join(os.path.dirname(__file__), 'data')
     courses = load_courses(data_dir, year, sem)
-    # 分類課程
+    # 分類課程，並過濾掉會衝堂的課
     tab_courses = {k: [] for k in ['通識','體育','語言','選修']}
     for c in courses:
         ctype = classify_course_type(c)
         if ctype:
-            tab_courses[ctype].append(c)
+            # 已選課或必修課不再顯示於可選課清單
+            if str(c.get('id')) in my_courses or str(c.get('id')) in required_ids:
+                continue
+            # 只顯示不衝堂的課
+            if not is_conflict(c):
+                tab_courses[ctype].append(c)
     # 取得已選課紀錄
     def nowstr():
         return datetime.now().strftime('%m/%d')
