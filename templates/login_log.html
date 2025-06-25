@@ -64,7 +64,7 @@
             <tr>
               <td>{{ item.username }}</td>
               <td>{{ item.ip }}</td>
-              <td class="ip-location" data-ip="{{ item.ip }}"></td>
+              <td>{{ item.location or '' }}</td>
               <td>{{ item.time | to_taipei_time }}</td>
             </tr>
             {% else %}
@@ -221,27 +221,6 @@ function exportTableToCSV(table, filename) {
   link.click();
   document.body.removeChild(link);
 }
-// --- IP 反查地點（登入日誌）---
-function fetchIpLocation(ip, td) {
-  // 使用 ip-api.com 免費 API
-  fetch(`https://ip-api.com/json/${ip}?lang=zh-TW`).then(r => r.json()).then(data => {
-    if (data.status === 'success') {
-      td.textContent = (data.country || '') + (data.regionName ? ' ' + data.regionName : '') + (data.city ? ' ' + data.city : '');
-    } else {
-      td.textContent = '查無';
-    }
-  }).catch(() => { td.textContent = '查詢失敗'; });
-}
-document.addEventListener('DOMContentLoaded', function() {
-  // 自動查詢登入日誌 IP 地點
-  document.querySelectorAll('#loginLogTbody tr').forEach(row => {
-    const ipTd = row.querySelector('td[data-ip]');
-    const locTd = row.querySelector('.ip-location');
-    if (ipTd && locTd) {
-      fetchIpLocation(ipTd.dataset.ip, locTd);
-    }
-  });
-});
 // --- 自動刷新/即時監控 ---
 let autoRefreshTimer = null;
 let lastActiveTab = 'login-log';
@@ -285,14 +264,6 @@ function fetchLogAjax(type) {
     if (type === 'login') {
       updateLoginLogTable(data);
       filterLoginLogByTime();
-      // 重新查詢 IP 地點
-      document.querySelectorAll('#loginLogTbody tr').forEach(row => {
-        const ipTd = row.querySelector('td[data-ip]');
-        const locTd = row.querySelector('.ip-location');
-        if (ipTd && locTd) {
-          fetchIpLocation(ipTd.dataset.ip, locTd);
-        }
-      });
     } else {
       updateOpLogTable(data);
       filterOpLogByTime();
@@ -302,7 +273,7 @@ function fetchLogAjax(type) {
 function updateLoginLogTable(logs) {
   const tbody = document.getElementById('loginLogTbody');
   tbody.innerHTML = logs.length ? logs.map(item =>
-    `<tr><td>${item.username}</td><td data-ip="${item.ip}">${item.ip}</td><td class="ip-location" data-ip="${item.ip}"></td><td>${toTaipeiTime(item.time)}</td></tr>`
+    `<tr><td>${item.username}</td><td>${item.ip}</td><td>${item.location or ''}</td><td>${toTaipeiTime(item.time)}</td></tr>`
   ).join('') : '<tr><td colspan="4" class="text-center">尚無登入紀錄</td></tr>';
 }
 function updateOpLogTable(logs) {

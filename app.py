@@ -8,6 +8,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from urllib.parse import quote
 from flask_swagger_ui import get_swaggerui_blueprint
 import csv
+import requests
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # 請改成安全的 key
@@ -1455,9 +1456,20 @@ def write_login_log(username, ip):
             log = json.load(f)
     except Exception:
         pass
+    # 查詢 IP 地理位置
+    location = "查無地點"
+    if ip != '127.0.0.1' and ip != '::1':
+        try:
+            res = requests.get(f'http://ip-api.com/json/{ip}?lang=zh-TW', timeout=2)
+            data = res.json()
+            if data.get('status') == 'success':
+                location = f"{data.get('country','')}{data.get('regionName','')}{data.get('city','')}"
+        except Exception:
+            location = "查詢失敗"
     log.append({
         'username': username,
         'ip': ip,
+        'location': location,
         'time': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     })
     with open(LOGIN_LOG_FILE, 'w', encoding='utf-8') as f:

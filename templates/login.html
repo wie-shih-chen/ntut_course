@@ -23,9 +23,7 @@
       {% endif %}
     {% endwith %}
     {% if user and user.role == 'admin' %}
-    <div class="text-end mb-2">
-      <a href="{{ url_for('admin_login_log') }}" class="btn btn-outline-secondary btn-sm">登入日誌</a>
-    </div>
+    {# 管理員專用登入日誌按鈕已移除 #}
     {% endif %}
   </div>
 </div>
