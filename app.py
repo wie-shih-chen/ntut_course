@@ -1602,5 +1602,31 @@ def api_query_log():
     write_query_log(session['user'], source, keyword, result_count)
     return jsonify({'status': 'ok'})
 
+@app.route('/student/course_search', methods=['GET'])
+def student_course_search():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    user = get_user(session['user'])
+    # 學生皆可查詢
+    data_dir = os.path.join(os.path.dirname(__file__), 'data')
+    years = sorted([d for d in os.listdir(data_dir) if d.isdigit()], reverse=True)
+    sems = ['1', '2']
+    year = request.args.get('year', years[0] if years else '')
+    sem = request.args.get('sem', sems[0])
+    class_name = request.args.get('class_name', '')
+    keyword = request.args.get('keyword', '').strip()
+    courses = load_courses(data_dir, year, sem) if year and sem else []
+    # 取得所有班級
+    classes = extract_classes(courses) if courses else []
+    # 過濾
+    filtered = []
+    for c in courses:
+        if class_name and not any(cls['name'] == class_name for cls in c.get('class', [])):
+            continue
+        if keyword and keyword not in c['name']['zh'] and keyword not in c.get('code', ''):
+            continue
+        filtered.append(c)
+    return render_template('student_course_search.html', user=user, years=years, sems=sems, year=year, sem=sem, class_name=class_name, classes=classes, keyword=keyword, courses=filtered)
+
 if __name__ == '__main__':
     app.run(debug=True) 

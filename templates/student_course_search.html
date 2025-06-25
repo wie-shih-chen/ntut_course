@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}課程查詢{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="fw-bold mb-3"><i class="bi bi-search me-2"></i>課程查詢</h2>
+  <form method="get" class="row g-2 align-items-end mb-4">
+    <div class="col-auto">
+      <label for="year" class="form-label mb-0">學年：</label>
+      <select name="year" id="year" class="form-select">
+        {% for y in years %}
+        <option value="{{ y }}" {% if y == year %}selected{% endif %}>{{ y }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-auto">
+      <label for="sem" class="form-label mb-0">學期：</label>
+      <select name="sem" id="sem" class="form-select">
+        {% for s in sems %}
+        <option value="{{ s }}" {% if s == sem %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-auto">
+      <label for="class_name" class="form-label mb-0">班級：</label>
+      <select name="class_name" id="class_name" class="form-select">
+        <option value="">全部</option>
+        {% for c in classes %}
+        <option value="{{ c }}" {% if c == class_name %}selected{% endif %}>{{ c }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-auto">
+      <label for="keyword" class="form-label mb-0">課程名稱/代碼：</label>
+      <input type="text" name="keyword" id="keyword" class="form-control" value="{{ keyword }}" placeholder="輸入關鍵字">
+    </div>
+    <div class="col-auto">
+      <button type="submit" class="btn btn-primary"><i class="bi bi-search me-1"></i>查詢</button>
+    </div>
+  </form>
+  <div class="table-responsive">
+    <table class="table table-bordered align-middle text-center shadow-sm">
+      <thead class="table-light">
+        <tr>
+          <th>課程名稱</th>
+          <th>課程代碼</th>
+          <th>老師</th>
+          <th>時間</th>
+          <th>學分</th>
+          <th>類型</th>
+          <th>班級</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in courses %}
+        <tr>
+          <td><a href="/course/{{ c.id }}?year={{ year }}&sem={{ sem }}&class_name={{ class_name }}">{{ c.name.zh }}</a></td>
+          <td>{{ c.code }}</td>
+          <td>{% for t in c.teacher %}<span class="badge bg-secondary bg-opacity-75 me-1">{{ t.name }}</span>{% endfor %}</td>
+          <td>{{ c.time | to_readable_time }}</td>
+          <td>{{ c.credit }}</td>
+          <td>{% if c.courseType == '▲' or c.courseType == '△' %}必修{% else %}選修{% endif %}</td>
+          <td>{% for cls in c.class %}<span class="badge bg-info bg-opacity-50 me-1">{{ cls.name }}</span>{% endfor %}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="text-muted">查無課程</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %} 
