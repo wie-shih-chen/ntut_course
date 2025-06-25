@@ -46,7 +46,7 @@
 
   <!-- 三大功能 -->
   <div class="row g-4 mb-4">
-    <div class="col-md-4">
+    <div class="col-md-3">
       <div class="card h-100 border-0 shadow-sm text-center p-4">
         <i class="bi bi-journal-text fs-1 text-primary mb-3"></i>
         <h5 class="fw-bold">選課系統</h5>
@@ -54,7 +54,15 @@
         <a href="{{ url_for('student_enroll') }}" class="btn btn-primary btn-sm w-75 mx-auto">進入選課</a>
       </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
+      <div class="card h-100 border-0 shadow-sm text-center p-4">
+        <i class="bi bi-search fs-1 text-info mb-3"></i>
+        <h5 class="fw-bold">課程查詢</h5>
+        <p class="text-muted small">瀏覽所有課程</p>
+        <a href="{{ url_for('student_course_search') }}" class="btn btn-info btn-sm w-75 mx-auto">查詢課程</a>
+      </div>
+    </div>
+    <div class="col-md-3">
       <div class="card h-100 border-0 shadow-sm text-center p-4">
         <i class="bi bi-calendar-week fs-1 text-success mb-3"></i>
         <h5 class="fw-bold">課表查詢</h5>
@@ -62,7 +70,7 @@
         <a href="{{ url_for('student_schedule') }}" class="btn btn-success btn-sm w-75 mx-auto">查看課表</a>
       </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
       <div class="card h-100 border-0 shadow-sm text-center p-4">
         <i class="bi bi-box-arrow-right fs-1 text-secondary mb-3"></i>
         <h5 class="fw-bold">登出</h5>
