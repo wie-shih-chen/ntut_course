@@ -4,3 +4,5 @@ bcrypt
 
 # for Render deployment
 gunicorn 
+
+requests 
