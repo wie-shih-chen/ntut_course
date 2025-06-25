@@ -154,7 +154,7 @@
       </thead>
       <tbody>
         {% for cid in my_courses %}
-        {% set c_list = (courses|selectattr('id','equalto',cid|int)|list) %}
+        {% set c_list = (courses|selectattr('id','equalto',cid)|list) %}
         {% if c_list %}
         {% set c = c_list[0] %}
         <tr>
